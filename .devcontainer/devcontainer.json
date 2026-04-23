@@ -1,40 +1,37 @@
 {
-	"name": "ESP-IDF v5.5",
+	"name": "ESP-IDF",
 	"build": {
 		"dockerfile": "Dockerfile"
 	},
-	// Add the IDs of extensions you want installed when the container is created.
+	"workspaceMount": "source=${localWorkspaceFolder},target=/workspaces,type=bind",
+	"workspaceFolder": "/workspaces",
+	"postStartCommand": "git config --global --add safe.directory '*'",
+	"mounts": [
+		"source=extensionCache,target=/root/.vscode-server/extensions,type=volume"
+	],
+	"runArgs": [
+		"--privileged",
+		"--env-file",
+		".env"
+	],
 	"customizations": {
 		"vscode": {
 			"extensions": [
+				"espressif.esp-idf-extension",
+				"github.vscode-github-actions",
+				"ms-vscode.cpptools-extension-pack",
+				"wokwi.wokwi-vscode",
 				"ms-vscode.cpptools",
 				"espressif.esp-idf-extension",
 				"Wokwi.wokwi-vscode",
 				"ms-vscode.cmake-tools"
 			],
 			"settings": {
-				"editor.formatOnSaveMode": "file",
-				"editor.formatOnSave": true,
 				"terminal.integrated.defaultProfile.linux": "bash",
 				"idf.espIdfPath": "/opt/esp/idf",
-				"idf.customExtraPaths": "",
-				"idf.pythonBinPath": "/opt/esp/python_env/idf5.5_py3.12_env/bin/python",
 				"idf.toolsPath": "/opt/esp",
 				"idf.gitPath": "/usr/bin/git"
 			}
 		}
-	},
-	"workspaceMount": "source=${localWorkspaceFolder},target=/workspaces,type=bind",
-	"workspaceFolder": "/workspaces",
-	"mounts": [
-		"source=/dev,target=/dev,type=bind",
-		"source=${env:HOME}/.gitconfig,target=/root/.gitconfig,type=bind,consistency=cached"
-	],
-	"runArgs": [
-		"--privileged"
-	],
-	"containerEnv": {
-		"LC_ALL": "C.UTF-8",
-		"LANG": "C.UTF-8"
 	}
 }

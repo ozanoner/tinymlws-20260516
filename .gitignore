@@ -79,3 +79,7 @@ Desktop.ini
 
 # temporary files 
 tmp/
+
+# local configuration files and folders
+.env
+.vscode
