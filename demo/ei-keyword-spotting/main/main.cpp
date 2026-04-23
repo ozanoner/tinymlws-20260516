@@ -7,7 +7,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "model-parameters/model_metadata.h"
-#include "gm_sample.wav.h"
+// #include "gm_sample.wav.h"
+#include "unknown.6mq9gm71.wav.h"
 #include "sdkconfig.h"
 
 static const char *TAG = "hello-world";
