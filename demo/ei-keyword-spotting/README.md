@@ -6,6 +6,11 @@ The app loads a bundled offline audio sample, runs a single inference, logs basi
 
 Note: Use the helper script at [tools/wavtoh.sh](../../tools/wavtoh.sh) to convert a WAV file into a C header for bundled sample audio.
 
+## Edge Impulse Project
+
+https://studio.edgeimpulse.com/studio/972337/
+
+
 ## Running on Wokwi
 
 Build:

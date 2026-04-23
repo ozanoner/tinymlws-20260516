@@ -3,7 +3,7 @@ FROM espressif/idf:v5.5.4
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
-RUN apt-get update && apt-get install -y udev clang-format vim-tiny
+RUN apt-get update && apt-get install -y udev clang-format vim-tiny ffmpeg bsdmainutils
 RUN curl -L https://wokwi.com/ci/install.sh | sh
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
