@@ -18,13 +18,8 @@
 		"vscode": {
 			"extensions": [
 				"espressif.esp-idf-extension",
-				"github.vscode-github-actions",
 				"ms-vscode.cpptools-extension-pack",
-				"wokwi.wokwi-vscode",
-				"ms-vscode.cpptools",
-				"espressif.esp-idf-extension",
-				"Wokwi.wokwi-vscode",
-				"ms-vscode.cmake-tools"
+				"wokwi.wokwi-vscode"
 			],
 			"settings": {
 				"terminal.integrated.defaultProfile.linux": "bash",
