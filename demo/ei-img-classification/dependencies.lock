@@ -1,0 +1,51 @@
+dependencies:
+  espressif/esp-dsp:
+    component_hash: c1832a2020342144d0de7940f73184584f182b3e9aa53180ee86c84ce7ff14dc
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=4.2'
+    source:
+      registry_url: https://components.espressif.com
+      type: service
+    version: 1.8.1
+  espressif/esp-nn:
+    component_hash: 918c7c8136f0fe8530962c57d03bde140678031adbca6ff8e2564676fe9b9245
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=4.2'
+    source:
+      registry_url: https://components.espressif.com
+      type: service
+    version: 1.2.1
+  idf:
+    source:
+      type: idf
+    version: 5.5.4
+  ozanoner/edgeimpulse-inference-sdk:
+    component_hash: 4f021b0ca9317c119642df82a4add39d37211b3c4e42c1ebbd038364a4c1a3ea
+    dependencies:
+    - name: espressif/esp-dsp
+      registry_url: https://components.espressif.com
+      require: private
+      version: ^1.8.0
+    - name: espressif/esp-nn
+      registry_url: https://components.espressif.com
+      require: private
+      version: ^1.2.1
+    - name: idf
+      require: private
+      version: '>=5.5,<6.0'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    targets:
+    - esp32s3
+    version: 0.1.1
+direct_dependencies:
+- idf
+- ozanoner/edgeimpulse-inference-sdk
+manifest_hash: 5207d96604949412283012d9848facca400841f0533fac6eb99dd23fa76e8d32
+target: esp32s3
+version: 2.0.0
