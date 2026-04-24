@@ -79,3 +79,9 @@ This repository is the scaffold for a hands-on TinyML workshop focused on Espres
 ## Status
 
 This is an initial README version generated from the current workshop outline. It will be expanded with concrete example commands, file paths, and troubleshooting playbooks as implementation content is added to the repository.
+
+
+## Troubleshooting
+
+- If DevContainer build fails, make sure `.env` exists in the workspace root.
+- WOKWI_CLI_TOKEN should be available in the environment. Create at https://wokwi.com/dashboard/ci
