@@ -4,19 +4,21 @@
 
 namespace app
 {
+    template <typename T>
     struct raw_data_t
     {
-        const int16_t *data;
+        const T *data;
         size_t length;
     };
 
+    template <typename T>
     class AppFeedBase
     {
     public:
         virtual ~AppFeedBase() = default;
 
         virtual void init() = 0;
-        virtual const raw_data_t *next() = 0;
+        virtual const raw_data_t<T> *next() = 0;
     };
 
 } // namespace app

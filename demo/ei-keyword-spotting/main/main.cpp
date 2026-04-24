@@ -18,7 +18,7 @@ extern "C" void app_main()
     feed.init();
     inference.init();
 
-    while (const app::raw_data_t *data = feed.next())
+    while (const app::raw_data_t<int16_t> *data = feed.next())
     {
         if (!inference.feed(data))
         {

@@ -1,20 +1,19 @@
 
 #pragma once
 
-#include "data/gm_sample.wav.hpp"
-#include "data/unknown.6mq9gm71.wav.hpp"
+#include "data/offline_sample.h"
 #include "AppFeedBase.hpp"
 
 namespace app
 {
-    class AppFeed : public AppFeedBase<int16_t>
+    class AppFeed : public AppFeedBase<uint32_t>
     {
     public:
         virtual ~AppFeed() = default;
         void init() override
         {
         }
-        const raw_data_t<int16_t> *next() override
+        const raw_data_t<uint32_t> *next() override
         {
             if (current_index >= data_len)
             {
@@ -24,12 +23,11 @@ namespace app
         }
 
     private:
-        static constexpr raw_data_t<int16_t> data[] = {
-            {kOfflineKeywordSample_gm, kOfflineKeywordSampleLength_gm},
-            {kOfflineKeywordSample_unknown, kOfflineKeywordSampleLength_unknown}};
+        static constexpr raw_data_t<uint32_t> data[] = {
+            {features, sizeof(features) / sizeof(features[0])}};
         static const size_t data_len = sizeof(data) / sizeof(data[0]);
 
-        static constexpr raw_data_t<int16_t> no_data{nullptr, 0};
+        static constexpr raw_data_t<uint32_t> no_data{nullptr, 0};
 
         size_t current_index = 0;
     };

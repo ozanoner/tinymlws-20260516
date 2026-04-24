@@ -10,7 +10,7 @@
 
 namespace app
 {
-    class AppInference : public AppInferenceBase
+    class AppInference : public AppInferenceBase<int16_t>
     {
     public:
         AppInference() = default;
@@ -19,7 +19,7 @@ namespace app
         void init() override
         {
 #if CONFIG_EI_DISABLE_HW_ACCEL
-            ESP_LOGW(TAG, "Hardware acceleration is disabled for this build.");
+            ESP_LOGW(TAG, "Hardware support is disabled for this build.");
 #endif
             ESP_LOGI(TAG, "Model: %s", EI_CLASSIFIER_PROJECT_NAME);
             ESP_LOGI(TAG, "Labels: %d", EI_CLASSIFIER_LABEL_COUNT);
@@ -27,7 +27,7 @@ namespace app
             current_data = nullptr;
         }
 
-        bool feed(const raw_data_t *const data) override
+        bool feed(const raw_data_t<int16_t> *const data) override
         {
             if (data == nullptr || data->length != EI_CLASSIFIER_RAW_SAMPLE_COUNT)
             {
@@ -78,7 +78,7 @@ namespace app
     private:
         static constexpr const char *TAG = "inference";
 
-        const raw_data_t *current_data{nullptr};
+        const raw_data_t<int16_t> *current_data{nullptr};
         ei_impulse_result_t result{};
     };
 }

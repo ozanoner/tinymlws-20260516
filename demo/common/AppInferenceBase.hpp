@@ -5,6 +5,7 @@
 namespace app
 {
 
+    template <typename T>
     class AppInferenceBase
     {
     public:
@@ -14,7 +15,7 @@ namespace app
         virtual void init() = 0;
 
         // Feed data into the inference engine, e.g., audio samples, images, etc.
-        virtual bool feed(const raw_data_t *const data) = 0;
+        virtual bool feed(const raw_data_t<T> *const data) = 0;
 
         // Run the inference engine on the fed data and produce results.
         virtual bool run() = 0;
