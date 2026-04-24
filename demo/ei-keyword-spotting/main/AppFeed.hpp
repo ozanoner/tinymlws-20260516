@@ -1,0 +1,37 @@
+
+#pragma once
+
+#include "data/gm_sample.wav.hpp"
+#include "data/unknown.6mq9gm71.wav.hpp"
+#include "AppFeedBase.hpp"
+
+namespace app
+{
+    class AppFeed : public AppFeedBase
+    {
+    public:
+        virtual ~AppFeed() = default;
+        void init() override
+        {
+        }
+        const raw_data_t *next() override
+        {
+            if (current_index >= data_len)
+            {
+                return &no_data; // No more data
+            }
+            return &data[current_index++];
+        }
+
+    private:
+        static constexpr raw_data_t data[] = {
+            {kOfflineKeywordSample_gm, kOfflineKeywordSampleLength_gm},
+            {kOfflineKeywordSample_unknown, kOfflineKeywordSampleLength_unknown}};
+        static const size_t data_len = sizeof(data) / sizeof(data[0]);
+
+        static constexpr raw_data_t no_data{nullptr, 0};
+
+        size_t current_index = 0;
+    };
+
+}

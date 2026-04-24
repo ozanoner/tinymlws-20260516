@@ -4,7 +4,7 @@ Offline keyword spotting example for this ESP-IDF component.
 
 The app loads a bundled offline audio sample, runs a single inference, logs basic model information, and prints the classifier output.
 
-Note: Use the helper script at [tools/wavtoh.sh](../../tools/wavtoh.sh) to convert a WAV file into a C header for bundled sample audio.
+Note: Use the helper script at [resources/wavtoh.sh](resources/wavtoh.sh) to convert a WAV file into a C header for bundled sample audio.
 
 ## Edge Impulse Project
 
