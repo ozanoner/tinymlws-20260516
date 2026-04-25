@@ -30,10 +30,6 @@ namespace app
 
         void init() override
         {
-#if CONFIG_EI_DISABLE_HW_ACCEL
-            ESP_LOGW(TAG, "Hardware support is disabled for this build.");
-#endif
-
             current_data = nullptr;
 
             // Map the model into a usable data structure. This doesn't involve any

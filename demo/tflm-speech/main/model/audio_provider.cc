@@ -18,14 +18,9 @@ limitations under the License.
 #include <cstdlib>
 #include <cstring>
 
-// FreeRTOS.h must be included before some of the following dependencies.
-// Solves b/150260343.
-// clang-format off
 #include "freertos/FreeRTOS.h"
-// clang-format on
 
 #include "esp_log.h"
-#include "esp_spi_flash.h"
 #include "esp_system.h"
 #include "esp_timer.h"
 #include "freertos/task.h"
@@ -33,10 +28,6 @@ limitations under the License.
 #include "micro_model_settings.h"
 
 using namespace std;
-
-// for c2 and c3, I2S support was added from IDF v4.4 onwards
-#define NO_I2S_SUPPORT CONFIG_IDF_TARGET_ESP32C2 || \
-                           (CONFIG_IDF_TARGET_ESP32C3 && (ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(4, 4, 0)))
 
 static const char *TAG = "TF_LITE_AUDIO_PROVIDER";
 /* ringbuffer to hold the incoming audio data */
@@ -52,9 +43,6 @@ constexpr int32_t history_samples_to_keep =
  * } */
 constexpr int32_t new_samples_to_get =
     (kFeatureStrideMs * (kAudioSampleFrequency / 1000));
-
-const int32_t kAudioCaptureBufferSize = 40000;
-const int32_t i2s_bytes_to_read = 3200;
 
 namespace
 {
@@ -73,7 +61,7 @@ namespace
 
   const int16_t *GetPrerecordedPcmBase()
   {
-    return reinterpret_cast<const int16_t *>(yes_1000ms_start + kWavHeaderBytes);
+    return reinterpret_cast<const int16_t *>(no_1000ms_start + kWavHeaderBytes);
   }
 
 } // namespace
@@ -85,28 +73,6 @@ TfLiteStatus InitAudioRecording()
   g_prerecorded_offset_samples = 0;
   g_is_audio_initialized = true;
   ESP_LOGI(TAG, "Audio provider initialized in prerecorded mode");
-  return kTfLiteOk;
-}
-
-TfLiteStatus GetAudioSamples1(int *audio_samples_size, int16_t **audio_samples)
-{
-  if (!g_is_audio_initialized)
-  {
-    TfLiteStatus init_status = InitAudioRecording();
-    if (init_status != kTfLiteOk)
-    {
-      return init_status;
-    }
-    g_is_audio_initialized = true;
-  }
-  const int16_t *prerecorded_pcm = GetPrerecordedPcmBase();
-  for (int i = 0; i < kPrerecordedTotalSamples; ++i)
-  {
-    g_audio_output_buffer[i] =
-        prerecorded_pcm[(g_prerecorded_offset_samples + i) % kPrerecordedTotalSamples];
-  }
-  *audio_samples_size = kPrerecordedTotalSamples;
-  *audio_samples = g_audio_output_buffer;
   return kTfLiteOk;
 }
 

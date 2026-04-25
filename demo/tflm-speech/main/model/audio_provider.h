@@ -29,9 +29,7 @@ limitations under the License.
 // it just returns an array filled with zeros. For real applications, you should
 // ensure there's a specialized implementation that accesses hardware APIs.
 TfLiteStatus GetAudioSamples(int start_ms, int duration_ms,
-                             int* audio_samples_size, int16_t** audio_samples);
-
-TfLiteStatus GetAudioSamples1(int* audio_samples_size, int16_t** audio_samples);
+                             int *audio_samples_size, int16_t **audio_samples);
 
 // Returns the time that audio data was last captured in milliseconds. There's
 // no contract about what time zero represents, the accuracy, or the granularity
@@ -43,4 +41,4 @@ TfLiteStatus GetAudioSamples1(int* audio_samples_size, int16_t** audio_samples);
 // your own platform-specific implementation.
 int32_t LatestAudioTimestamp();
 
-#endif  // TENSORFLOW_LITE_MICRO_EXAMPLES_MICRO_SPEECH_AUDIO_PROVIDER_H_
+#endif // TENSORFLOW_LITE_MICRO_EXAMPLES_MICRO_SPEECH_AUDIO_PROVIDER_H_
