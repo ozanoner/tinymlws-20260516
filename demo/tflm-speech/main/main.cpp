@@ -29,6 +29,8 @@ limitations under the License.
 #include "tensorflow/lite/micro/micro_interpreter.h"
 #include "tensorflow/lite/micro/micro_log.h"
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 // Globals, used for compatibility with Arduino-style sketches.
 namespace
@@ -211,5 +213,6 @@ extern "C" void app_main()
   while (true)
   {
     loop();
+    vTaskDelay(pdMS_TO_TICKS(1000));
   }
 }

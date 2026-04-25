@@ -8,10 +8,9 @@ idf_component_register(SRCS "main.cpp"
             model/recognize_commands.cc
             model/ringbuf.c
             model/yes_micro_features_data.cc
-    INCLUDE_DIRS "." data model
+    INCLUDE_DIRS "." data model ../../common
     EMBED_FILES ../resources/no_1000ms.wav 
-        ../resources/yes_1000ms.wav 
-        ../resources/noise_1000ms.wav)
+        ../resources/yes_1000ms.wav)
 
 target_compile_options(${COMPONENT_LIB} PRIVATE
     -Wno-maybe-uninitialized
@@ -19,6 +18,3 @@ target_compile_options(${COMPONENT_LIB} PRIVATE
     -Wno-error=sign-compare
     -Wno-error=double-promotion
     -Wno-type-limits)        
-
-target_compile_definitions(${COMPONENT_LIB} PRIVATE
-    MICRO_SPEECH_USE_PRERECORDED_AUDIO=1)
