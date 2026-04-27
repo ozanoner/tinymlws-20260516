@@ -25,7 +25,7 @@ Run:
 wokwi-cli . --timeout 120000 --fail-text "Backtrace:" --expect-text "Returned from app_main"
 ```
 
-### Running on ESP32-S3
+## Running on ESP32-S3
 
 Build:
 

@@ -42,7 +42,6 @@ namespace app
 
             if (current_index >= data_len)
             {
-                ESP_LOGW(TAG, "No more data to feed");
                 return nullptr;
             }
 

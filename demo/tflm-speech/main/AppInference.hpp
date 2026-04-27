@@ -97,8 +97,6 @@ namespace app
                                                        feature_buffer);
             feature_provider = &static_feature_provider;
 
-            app_feed.init();
-
             previous_time = 0;
         }
 
