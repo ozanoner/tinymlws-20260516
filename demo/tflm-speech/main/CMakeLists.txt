@@ -1,11 +1,7 @@
 idf_component_register(SRCS "main.cpp"
-            model/audio_provider.cc
-            model/command_responder.cc
-            model/feature_provider.cc
             model/micro_features_generator.cc
             model/model.cc
             model/no_micro_features_data.cc
-            model/recognize_commands.cc
             model/ringbuf.c
             model/yes_micro_features_data.cc
     INCLUDE_DIRS "." data model ../../common

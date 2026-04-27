@@ -5,20 +5,17 @@
 #include <cstdint>
 #include <iterator>
 
-#include "audio_provider.h"
-#include "command_responder.h"
-#include "feature_provider.h"
 #include "micro_model_settings.h"
 #include "model.h"
-#include "recognize_commands.h"
 #include "tensorflow/lite/micro/system_setup.h"
 #include "tensorflow/lite/schema/schema_generated.h"
 #include "tensorflow/lite/core/c/common.h"
 #include "tensorflow/lite/micro/micro_interpreter.h"
-#include "tensorflow/lite/micro/micro_log.h"
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
 
 #include "AppInferenceBase.hpp"
+#include "AppFeatures.hpp"
+#include "AppFeed.hpp"
 
 namespace app
 {
@@ -37,9 +34,9 @@ namespace app
             model = tflite::GetModel(g_model);
             if (model->version() != TFLITE_SCHEMA_VERSION)
             {
-                MicroPrintf("Model provided is schema version %d not equal to supported "
-                            "version %d.",
-                            model->version(), TFLITE_SCHEMA_VERSION);
+                ESP_LOGE(TAG,
+                         "Model schema version %d does not match supported version %d",
+                         model->version(), TFLITE_SCHEMA_VERSION);
                 return;
             }
 
@@ -78,7 +75,7 @@ namespace app
             TfLiteStatus allocate_status = interpreter->AllocateTensors();
             if (allocate_status != kTfLiteOk)
             {
-                MicroPrintf("AllocateTensors() failed");
+                ESP_LOGE(TAG, "AllocateTensors() failed");
                 return;
             }
 
@@ -89,42 +86,95 @@ namespace app
                  (kFeatureCount * kFeatureSize)) ||
                 (model_input->type != kTfLiteInt8))
             {
-                MicroPrintf("Bad input tensor parameters in model");
+                ESP_LOGE(TAG, "Bad input tensor parameters in model");
                 return;
             }
             model_input_buffer = tflite::GetTensorData<int8_t>(model_input);
 
             // Prepare to access the audio spectrograms from a microphone or other source
             // that will provide the inputs to the neural network.
-            // NOLINTNEXTLINE(runtime-global-variables)
-            static FeatureProvider static_feature_provider(kFeatureElementCount,
-                                                           feature_buffer);
+            static AppFeatures static_feature_provider(kFeatureElementCount,
+                                                       feature_buffer);
             feature_provider = &static_feature_provider;
 
-            static RecognizeCommands static_recognizer;
-            recognizer = &static_recognizer;
+            app_feed.init();
 
             previous_time = 0;
         }
 
-        bool feed(const raw_data_t<int16_t> *const data) override
-        {
-            if (data == nullptr)
-            {
-                return false;
-            }
-            current_data = data;
-            return true;
-        }
+        bool feed(const raw_data_t<int16_t> *const data) override { return false; }
 
         bool run() override
         {
+            auto next_data = app_feed.next();
+            if (next_data == nullptr || next_data->data == nullptr || next_data->length == 0)
+            {
+                ESP_LOGW(TAG, "No more data to feed");
+                return false;
+            }
+
+            // Fetch the spectrogram for the current time.
+            const int32_t current_time = app_feed.LatestAudioTimestamp();
+
+            int how_many_new_slices = 0;
+            TfLiteStatus feature_status = feature_provider->PopulateFeatureData(
+                previous_time, current_time, &how_many_new_slices, &app_feed);
+            if (feature_status != kTfLiteOk)
+            {
+                ESP_LOGE(TAG, "Feature generation failed");
+                return false;
+            }
+
+            previous_time = current_time;
+            // If no new audio samples have been received since last time, don't bother
+            // running the network model.
+            if (how_many_new_slices > 0)
+            {
+
+                // Copy feature buffer to input tensor
+                for (int i = 0; i < kFeatureElementCount; i++)
+                {
+                    model_input_buffer[i] = feature_buffer[i];
+                }
+
+                // Run the model on the spectrogram input and make sure it succeeds.
+                TfLiteStatus invoke_status = interpreter->Invoke();
+                if (invoke_status != kTfLiteOk)
+                {
+                    ESP_LOGE(TAG, "Invoke failed");
+                    return false;
+                }
+            }
 
             return true;
         }
 
         void handleResult() override
         {
+            // Obtain a pointer to the output tensor
+            TfLiteTensor *output = interpreter->output(0);
+
+            float output_scale = output->params.scale;
+            int output_zero_point = output->params.zero_point;
+            int max_idx = 0;
+            float max_result = 0.0;
+            // Dequantize output values and find the max
+            for (int i = 0; i < kCategoryCount; i++)
+            {
+                float current_result =
+                    (tflite::GetTensorData<int8_t>(output)[i] - output_zero_point) *
+                    output_scale;
+                if (current_result > max_result)
+                {
+                    max_result = current_result; // update max result
+                    max_idx = i;                 // update category
+                }
+            }
+            if (max_result > 0.8f)
+            {
+                ESP_LOGI(TAG, "Detected %7s, score: %.2f", kCategoryLabels[max_idx],
+                         static_cast<double>(max_result));
+            }
         }
 
     private:
@@ -135,8 +185,7 @@ namespace app
         const tflite::Model *model = nullptr;
         tflite::MicroInterpreter *interpreter = nullptr;
         TfLiteTensor *model_input = nullptr;
-        FeatureProvider *feature_provider = nullptr;
-        RecognizeCommands *recognizer = nullptr;
+        AppFeatures *feature_provider = nullptr;
         int32_t previous_time = 0;
 
         // Create an area of memory to use for input, output, and intermediate arrays.
@@ -146,5 +195,7 @@ namespace app
         uint8_t tensor_arena[kTensorArenaSize];
         int8_t feature_buffer[kFeatureElementCount];
         int8_t *model_input_buffer = nullptr;
+
+        AppFeed app_feed;
     };
 }
