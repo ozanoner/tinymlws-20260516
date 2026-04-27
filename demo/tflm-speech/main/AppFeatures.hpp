@@ -28,6 +28,10 @@ namespace app
               is_first_run_(true)
         {
             std::fill(feature_data_, feature_data_ + feature_size_, int8_t{0});
+            if (InitializeMicroFeatures() != kTfLiteOk)
+            {
+                ESP_LOGE(TAG, "InitializeMicroFeatures failed");
+            }
         }
 
         ~AppFeatures() = default;
@@ -50,15 +54,10 @@ namespace app
             const int current_step = (time_in_ms / kFeatureStrideMs);
 
             int slices_needed = current_step - last_step;
+
             // If this is the first call, make sure we don't use any cached information.
             if (is_first_run_)
             {
-                TfLiteStatus init_status = InitializeMicroFeatures();
-                if (init_status != kTfLiteOk)
-                {
-                    return init_status;
-                }
-                ESP_LOGI(TAG, "InitializeMicroFeatures successful");
                 is_first_run_ = false;
                 slices_needed = kFeatureCount;
             }
@@ -139,6 +138,12 @@ namespace app
             }
 
             return kTfLiteOk;
+        }
+
+        void reset()
+        {
+            std::fill(feature_data_, feature_data_ + feature_size_, int8_t{0});
+            is_first_run_ = true;
         }
 
     private:

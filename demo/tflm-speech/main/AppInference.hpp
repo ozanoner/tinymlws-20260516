@@ -175,6 +175,8 @@ namespace app
                 ESP_LOGI(TAG, "Detected %7s, score: %.2f", kCategoryLabels[max_idx],
                          static_cast<double>(max_result));
             }
+
+            feature_provider->reset();
         }
 
     private:

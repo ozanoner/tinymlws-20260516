@@ -28,33 +28,37 @@ namespace app
     {
     public:
         virtual ~AppFeed() = default;
+
         void init() override
         {
             memset(g_history_buffer, 0, sizeof(g_history_buffer));
-            g_prerecorded_timestamp_ms = 0;
             g_prerecorded_offset_samples = 0;
             g_is_audio_initialized = true;
-            ESP_LOGI(TAG, "Audio provider initialized in prerecorded mode");
         }
+
         const raw_data_t<int16_t> *next() override
         {
-            const raw_data_t<int16_t> *const data = getData();
+            ++current_index;
+
             if (current_index >= data_len)
             {
-                return &data[data_len - 1]; // No more data
+                ESP_LOGW(TAG, "No more data to feed");
+                return nullptr;
             }
+
             g_is_audio_initialized = false;
-            return &data[current_index++];
+            return &getData()[current_index];
         }
 
         TfLiteStatus GetAudioSamples(int *audio_samples_size, int16_t **audio_samples)
         {
-            if (getData()[current_index].data == nullptr || getData()[current_index].length == 0)
+            auto prerecorded_pcm = getData()[current_index];
+
+            if (prerecorded_pcm.data == nullptr || prerecorded_pcm.length == 0)
             {
-                ESP_LOGW(TAG, "No more audio data to provide");
+                ESP_LOGE(TAG, "Invalid audio data");
                 return kTfLiteError;
             }
-            const int16_t *prerecorded_pcm = getData()[current_index].data;
 
             if (!g_is_audio_initialized)
             {
@@ -67,7 +71,7 @@ namespace app
             for (int i = 0; i < new_samples_to_get; ++i)
             {
                 g_audio_output_buffer[history_samples_to_keep + i] =
-                    prerecorded_pcm[(g_prerecorded_offset_samples + i) % kPrerecordedTotalSamples];
+                    prerecorded_pcm.data[(g_prerecorded_offset_samples + i) % kPrerecordedTotalSamples];
             }
 
             g_prerecorded_offset_samples =
@@ -109,14 +113,13 @@ namespace app
                 {reinterpret_cast<const int16_t *>(no_1000ms_start + kWavHeaderBytes),
                  (no_1000ms_end - no_1000ms_start - kWavHeaderBytes) / sizeof(int16_t)},
                 {reinterpret_cast<const int16_t *>(yes_1000ms_start + kWavHeaderBytes),
-                 (yes_1000ms_end - yes_1000ms_start - kWavHeaderBytes) / sizeof(int16_t)},
-                {nullptr, 0}};
+                 (yes_1000ms_end - yes_1000ms_start - kWavHeaderBytes) / sizeof(int16_t)}};
             return data;
         }
 
-        static constexpr size_t data_len = 3;
+        static constexpr size_t data_len = 2;
 
-        size_t current_index = 0;
+        int current_index = -1;
     };
 
 }
