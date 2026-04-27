@@ -11,6 +11,7 @@
 	],
 	"runArgs": [
 		"--privileged",
+		"--volume=/dev:/dev",
 		"--env-file",
 		".env"
 	],
