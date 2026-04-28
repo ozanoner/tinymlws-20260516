@@ -5,7 +5,7 @@
 
 #include "AppFeedBase.hpp"
 
-#define IMAGE_COUNT 10
+#define IMAGE_COUNT 3
 #define IMAGE_SIZE (96 * 96)
 
 extern const uint8_t image0_start[] asm("_binary_image0_start");
@@ -46,10 +46,10 @@ namespace app
     private:
         static constexpr const char *TAG = "feed";
         const uint8_t *image_database[IMAGE_COUNT]{
-            image0_start, image1_start, image2_start,
-            image3_start, image4_start, image5_start,
-            image6_start, image7_start, image8_start,
-            image9_start};
+            image0_start,
+            image1_start,
+            image2_start,
+        };
 
         int8_t current_image[IMAGE_SIZE]{};
         raw_data_t<int8_t> data{current_image, IMAGE_SIZE};

@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include "esp_log.h"
-#include "esp_heap_caps.h"
 
 #include "model_settings.h"
 #include "person_detect_model_data.h"
@@ -28,11 +27,11 @@ namespace app
                 return;
             }
 
-            if (tensor_arena == NULL)
+            if (tensor_arena == nullptr)
             {
-                tensor_arena = (uint8_t *)heap_caps_malloc(kTensorArenaSize, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+                tensor_arena = (uint8_t *)malloc(kTensorArenaSize);
             }
-            if (tensor_arena == NULL)
+            if (tensor_arena == nullptr)
             {
                 ESP_LOGE(TAG, "Couldn't allocate memory of %d bytes", kTensorArenaSize);
                 return;
@@ -90,22 +89,18 @@ namespace app
 
             // Process the inference results.
             int8_t person_score = output->data.uint8[kPersonIndex];
-            int8_t no_person_score = output->data.uint8[kNotAPersonIndex];
-
             float person_score_f =
                 (person_score - output->params.zero_point) * output->params.scale;
-            float no_person_score_f =
-                (no_person_score - output->params.zero_point) * output->params.scale;
 
-            ESP_LOGI(TAG, "Person score: %f, No person score: %f", person_score_f, no_person_score_f);
+            ESP_LOGI(TAG, "Person score: %f", person_score_f);
         }
 
     protected:
         static constexpr const char *TAG = "inference";
 
-        const tflite::Model *model = nullptr;
-        tflite::MicroInterpreter *interpreter = nullptr;
-        TfLiteTensor *input = nullptr;
+        const tflite::Model *model{nullptr};
+        tflite::MicroInterpreter *interpreter{nullptr};
+        TfLiteTensor *input{nullptr};
 
         // In order to use optimized tensorflow lite kernels, a signed int8_t quantized
         // model is preferred over the legacy unsigned model format. This means that
@@ -115,11 +110,11 @@ namespace app
         // signed value.
 
         // CONFIG_NN_OPTIMIZED
-        const int scratchBufSize = 60 * 1024;
+        const int scratchBufSize{60 * 1024};
         // An area of memory to use for input, output, and intermediate arrays.
         // Keeping allocation on bit larger size to accomodate future needs.
-        const int kTensorArenaSize = 100 * 1024 + scratchBufSize;
-        uint8_t *tensor_arena; //[kTensorArenaSize]; // Maybe we should move this to external
+        const int kTensorArenaSize{100 * 1024 + scratchBufSize};
+        uint8_t *tensor_arena;
 
         const raw_data_t<int8_t> *current_data{nullptr};
     };
