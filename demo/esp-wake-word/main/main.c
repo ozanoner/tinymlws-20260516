@@ -14,7 +14,6 @@
 #include "model_path.h"
 #include "string.h"
 #include "hiesp.h"
-#include "hilexin.h"
 
 void app_main(void)
 {
@@ -64,12 +63,12 @@ void app_main(void)
         data_size = sizeof(hiesp);
         printf("wake word: %s, size:%d\n", "hiesp", data_size);
     }
-    else if (strstr(model_name, "hilexin") != NULL)
-    {
-        data = (unsigned char *)hilexin;
-        data_size = sizeof(hilexin);
-        printf("wake word: %s, size:%d\n", "hilexin", data_size);
-    }
+    // else if (strstr(model_name, "hilexin") != NULL)
+    // {
+    //     data = (unsigned char *)hilexin;
+    //     data_size = sizeof(hilexin);
+    //     printf("wake word: %s, size:%d\n", "hilexin", data_size);
+    // }
 
     while (1)
     {
@@ -86,15 +85,12 @@ void app_main(void)
         if (state == WAKENET_DETECTED)
         {
             printf("Detected\n");
+            break;
         }
         chunks++;
-        if ((chunks & 0x07) == 0)
-        {
-            vTaskDelay(pdMS_TO_TICKS(1));
-        }
+        vTaskDelay(pdMS_TO_TICKS(1));
     }
 
     free(buffer);
     wakenet->destroy(model_data);
-    vTaskDelete(NULL);
 }
