@@ -1,0 +1,5 @@
+dependencies:
+  human_face_detect:
+    version: '*'
+  espressif/esp-dl:
+    version: '*'
