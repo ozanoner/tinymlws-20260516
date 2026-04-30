@@ -9,8 +9,8 @@
       "top": 0,
       "left": 0,
       "attrs": {
-        "psramSize": "8",
-        "psramType": "octal"
+        "psramSize": "4",
+        "psramType": "quad"
       }
     }
   ],
