@@ -28,8 +28,8 @@ namespace app
         {
             model = new HumanFaceDetect(
                 static_cast<HumanFaceDetect::model_type_t>(CONFIG_DEFAULT_HUMAN_FACE_DETECT_MODEL), false);
-            model->set_score_thr(0.3F, 0);
-            model->set_score_thr(0.3F, 1);
+            model->set_score_thr(0.7F, 0);
+            model->set_score_thr(0.7F, 1);
         }
 
         bool feed(const raw_data_t<uint8_t> *const data) override
