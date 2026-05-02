@@ -1,9 +1,7 @@
 idf_component_register(SRCS "main.cpp"
             model/micro_features_generator.cc
             model/model.cc
-            model/no_micro_features_data.cc
             model/ringbuf.c
-            model/yes_micro_features_data.cc
     INCLUDE_DIRS "." data model ../../common)
 
 target_compile_options(${COMPONENT_LIB} PRIVATE
