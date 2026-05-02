@@ -17,6 +17,8 @@
 #include "AppFeatures.hpp"
 #include "AppFeed.hpp"
 
+#define TENSOR_ARENA_SIZE (30 * 1024)
+
 namespace app
 {
     class AppInference : public AppInferenceBase<int16_t>
@@ -29,8 +31,6 @@ namespace app
         {
             current_data = nullptr;
 
-            // Map the model into a usable data structure. This doesn't involve any
-            // copying or parsing, it's a very lightweight operation.
             model = tflite::GetModel(g_model);
             if (model->version() != TFLITE_SCHEMA_VERSION)
             {
@@ -40,14 +40,8 @@ namespace app
                 return;
             }
 
-            // Pull in only the operation implementations we need.
-            // This relies on a complete list of all the ops needed by this graph.
-            // An easier approach is to just use the AllOpsResolver, but this will
-            // incur some penalty in code space for op implementations that are not
-            // needed by this graph.
-            //
+            // An easier approach is to just use the AllOpsResolver
             // tflite::AllOpsResolver resolver;
-            // NOLINTNEXTLINE(runtime-global-variables)
             static tflite::MicroMutableOpResolver<4> micro_op_resolver;
             if (micro_op_resolver.AddDepthwiseConv2D() != kTfLiteOk)
             {
@@ -68,7 +62,7 @@ namespace app
 
             // Build an interpreter to run the model with.
             static tflite::MicroInterpreter static_interpreter(
-                model, micro_op_resolver, tensor_arena, kTensorArenaSize);
+                model, micro_op_resolver, tensor_arena, TENSOR_ARENA_SIZE);
             interpreter = &static_interpreter;
 
             // Allocate memory from the tensor_arena for the model's tensors.
@@ -91,8 +85,6 @@ namespace app
             }
             model_input_buffer = tflite::GetTensorData<int8_t>(model_input);
 
-            // Prepare to access the audio spectrograms from a microphone or other source
-            // that will provide the inputs to the neural network.
             static AppFeatures static_feature_provider(kFeatureElementCount,
                                                        feature_buffer);
             feature_provider = &static_feature_provider;
@@ -111,11 +103,10 @@ namespace app
                 return false;
             }
 
-            // Fetch the spectrogram for the current time.
-            const int32_t current_time = app_feed.LatestAudioTimestamp();
+            const int32_t current_time = app_feed.latestAudioTimestamp();
 
             int how_many_new_slices = 0;
-            TfLiteStatus feature_status = feature_provider->PopulateFeatureData(
+            TfLiteStatus feature_status = feature_provider->populateFeatureData(
                 previous_time, current_time, &how_many_new_slices, &app_feed);
             if (feature_status != kTfLiteOk)
             {
@@ -156,6 +147,7 @@ namespace app
             int output_zero_point = output->params.zero_point;
             int max_idx = 0;
             float max_result = 0.0;
+
             // Dequantize output values and find the max
             for (int i = 0; i < kCategoryCount; i++)
             {
@@ -168,9 +160,15 @@ namespace app
                     max_idx = i;                 // update category
                 }
             }
+
             if (max_result > 0.8f)
             {
                 ESP_LOGI(TAG, "Detected %7s, score: %.2f", kCategoryLabels[max_idx],
+                         static_cast<double>(max_result));
+            }
+            else
+            {
+                ESP_LOGI(TAG, "No keyword detected, max score: %.2f",
                          static_cast<double>(max_result));
             }
 
@@ -188,11 +186,7 @@ namespace app
         AppFeatures *feature_provider = nullptr;
         int32_t previous_time = 0;
 
-        // Create an area of memory to use for input, output, and intermediate arrays.
-        // The size of this will depend on the model you're using, and may need to be
-        // determined by experimentation.
-        static const int kTensorArenaSize = 30 * 1024;
-        uint8_t tensor_arena[kTensorArenaSize];
+        uint8_t tensor_arena[TENSOR_ARENA_SIZE];
         int8_t feature_buffer[kFeatureElementCount];
         int8_t *model_input_buffer = nullptr;
 

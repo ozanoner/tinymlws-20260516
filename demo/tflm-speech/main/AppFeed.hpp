@@ -1,26 +1,23 @@
 
 #pragma once
 
+#include <algorithm>
+#include "esp_log.h"
+
 #include "tensorflow/lite/c/common.h"
 #include "micro_model_settings.h"
 #include "ringbuf.h"
-
-#include "esp_log.h"
+#include "yes_1000ms.wav.h"
+#include "no_1000ms.wav.h"
 
 #include "AppFeedBase.hpp"
 
 constexpr int32_t history_samples_to_keep =
     ((kFeatureDurationMs - kFeatureStrideMs) *
      (kAudioSampleFrequency / 1000));
-/* new samples to get each time from ringbuffer, { new_samples_to_get =  20 * 16
- * } */
+
 constexpr int32_t new_samples_to_get =
     (kFeatureStrideMs * (kAudioSampleFrequency / 1000));
-
-extern const uint8_t no_1000ms_start[] asm("_binary_no_1000ms_wav_start");
-extern const uint8_t no_1000ms_end[] asm("_binary_no_1000ms_wav_end");
-extern const uint8_t yes_1000ms_start[] asm("_binary_yes_1000ms_wav_start");
-extern const uint8_t yes_1000ms_end[] asm("_binary_yes_1000ms_wav_end");
 
 namespace app
 {
@@ -31,27 +28,27 @@ namespace app
 
         void init() override
         {
-            memset(g_history_buffer, 0, sizeof(g_history_buffer));
-            g_prerecorded_offset_samples = 0;
-            g_is_audio_initialized = true;
+            memset(history_buffer, 0, sizeof(history_buffer));
+            offset_samples = 0;
+            is_initialized = true;
         }
 
         const raw_data_t<int16_t> *next() override
         {
             ++current_index;
 
-            if (current_index >= data_len)
+            if (current_index >= audio_data_cnt)
             {
                 return nullptr;
             }
 
-            g_is_audio_initialized = false;
-            return &getData()[current_index];
+            is_initialized = false;
+            return &audio_data[current_index];
         }
 
-        TfLiteStatus GetAudioSamples(int *audio_samples_size, int16_t **audio_samples)
+        TfLiteStatus getAudioSamples(int *audio_samples_size, int16_t **audio_samples)
         {
-            auto prerecorded_pcm = getData()[current_index];
+            auto prerecorded_pcm = audio_data[current_index];
 
             if (prerecorded_pcm.data == nullptr || prerecorded_pcm.length == 0)
             {
@@ -59,64 +56,52 @@ namespace app
                 return kTfLiteError;
             }
 
-            if (!g_is_audio_initialized)
+            if (!is_initialized)
             {
                 init();
             }
 
-            memcpy((void *)(g_audio_output_buffer), (void *)(g_history_buffer),
+            memcpy(output_buffer, history_buffer,
                    history_samples_to_keep * sizeof(int16_t));
 
             for (int i = 0; i < new_samples_to_get; ++i)
             {
-                g_audio_output_buffer[history_samples_to_keep + i] =
-                    prerecorded_pcm.data[(g_prerecorded_offset_samples + i) % kPrerecordedTotalSamples];
+                output_buffer[history_samples_to_keep + i] =
+                    prerecorded_pcm.data[(offset_samples + i) % kAudioSampleFrequency];
             }
 
-            g_prerecorded_offset_samples =
-                (g_prerecorded_offset_samples + new_samples_to_get) % kPrerecordedTotalSamples;
+            offset_samples =
+                (offset_samples + new_samples_to_get) % kAudioSampleFrequency;
 
-            memcpy((void *)(g_history_buffer),
-                   (void *)(g_audio_output_buffer + new_samples_to_get),
+            memcpy(history_buffer,
+                   output_buffer + new_samples_to_get,
                    history_samples_to_keep * sizeof(int16_t));
 
             *audio_samples_size = kMaxAudioSampleSize;
-            *audio_samples = g_audio_output_buffer;
+            *audio_samples = output_buffer;
             return kTfLiteOk;
         }
 
-        int32_t LatestAudioTimestamp()
+        int32_t latestAudioTimestamp()
         {
-            g_prerecorded_timestamp_ms += kPrerecordedStrideMs;
-            return g_prerecorded_timestamp_ms;
+            timestamp_ms += kFeatureStrideMs;
+            return timestamp_ms;
         }
 
     private:
         static constexpr const char *TAG = "feed";
 
-        // From model
-        int16_t g_audio_output_buffer[kMaxAudioSampleSize * 32];
-        bool g_is_audio_initialized = false;
-        int16_t g_history_buffer[history_samples_to_keep];
+        bool is_initialized = false;
+        int16_t output_buffer[kMaxAudioSampleSize * 32];
+        int16_t history_buffer[history_samples_to_keep];
 
-        static const int kWavHeaderBytes = 44;
-        static const int kPrerecordedTotalSamples = 16000;
-        static const int kPrerecordedStrideMs = kFeatureStrideMs;
-        int32_t g_prerecorded_timestamp_ms = 0;
-        int g_prerecorded_offset_samples = 0;
+        int32_t timestamp_ms = 0;
+        int offset_samples = 0;
 
-        // class internals
-        static const raw_data_t<int16_t> *getData()
-        {
-            static const raw_data_t<int16_t> data[] = {
-                {reinterpret_cast<const int16_t *>(no_1000ms_start + kWavHeaderBytes),
-                 (no_1000ms_end - no_1000ms_start - kWavHeaderBytes) / sizeof(int16_t)},
-                {reinterpret_cast<const int16_t *>(yes_1000ms_start + kWavHeaderBytes),
-                 (yes_1000ms_end - yes_1000ms_start - kWavHeaderBytes) / sizeof(int16_t)}};
-            return data;
-        }
-
-        static constexpr size_t data_len = 2;
+        static constexpr raw_data_t<int16_t> audio_data[] = {
+            {kOfflineKeywordSample_no, kOfflineKeywordSampleLength_no},
+            {kOfflineKeywordSample_yes, kOfflineKeywordSampleLength_yes}};
+        static const size_t audio_data_cnt = sizeof(audio_data) / sizeof(audio_data[0]);
 
         int current_index = -1;
     };
