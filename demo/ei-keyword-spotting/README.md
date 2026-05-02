@@ -5,7 +5,7 @@ The model classifies 16 kHz audio into two categories: **good_morning** and **un
 
 `AppFeed` iterates over two bundled 1-second PCM clips (`gm_sample` and `unknown`). For each clip `AppInference` calls `ei_run_classifier` from the Edge Impulse C++ SDK, then prints the label scores via `ei_print_results`.
 
-> **Tip:** use the helper script at [/workspaces/tools/wavtoh.sh](/workspaces/tools/wavtoh.sh) to convert a WAV file into a C header for a new bundled sample.
+> **Tip:** use the helper script at [tools/wavtoh.sh](../../tools/wavtoh.sh) to convert a WAV file into a C header for a new bundled sample.
 
 ## Project structure
 

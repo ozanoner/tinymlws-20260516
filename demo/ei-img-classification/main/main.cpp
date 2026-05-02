@@ -1,4 +1,8 @@
 
+// Entry point for the Edge Impulse image classification demo.
+// Iterates over bundled test images via AppFeed, runs the EI classifier
+// through AppInference for each image, and reports the top prediction.
+
 #include "esp_log.h"
 
 #include "AppFeed.hpp"
