@@ -1,3 +1,5 @@
+// AppInference — runs the Edge Impulse classifier on a PCM clip and prints results.
+
 #pragma once
 
 #include "esp_log.h"
@@ -10,12 +12,15 @@
 
 namespace app
 {
+    /// Drives one EI inference cycle: accepts a raw PCM buffer, converts it to a
+    /// float signal, invokes `run_classifier`, and prints label scores.
     class AppInference : public AppInferenceBase<int16_t>
     {
     public:
         AppInference() = default;
         ~AppInference() override = default;
 
+        /// Logs model name and label count; resets current data pointer.
         void init() override
         {
 #if CONFIG_EI_DISABLE_HW_ACCEL
@@ -27,9 +32,10 @@ namespace app
             current_data = nullptr;
         }
 
+        /// Stores @p data as the source for the next `run()` call.
         bool feed(const raw_data_t<int16_t> *const data) override
         {
-            if (data == nullptr || data->length != EI_CLASSIFIER_RAW_SAMPLE_COUNT)
+            if (data == nullptr || data->length == 0)
             {
                 return false;
             }
@@ -37,6 +43,8 @@ namespace app
             return true;
         }
 
+        /// EI signal callback: converts int16 samples at [@p offset, @p offset+@p length)
+        /// to float into @p out_ptr.
         int getSignalData(size_t offset, size_t length, float *out_ptr)
         {
             // no data
@@ -52,8 +60,11 @@ namespace app
             return ei::numpy::int16_to_float(&current_data->data[offset], out_ptr, length);
         }
 
+        /// Builds the EI signal wrapper and calls `run_classifier`.
         bool run() override
         {
+            // Wrap the stored PCM buffer in an EI signal_t so the SDK can
+            // pull float samples on demand via the get_data callback.
             signal_t signal{};
             signal.total_length = EI_CLASSIFIER_RAW_SAMPLE_COUNT;
             signal.get_data = [this](size_t offset, size_t length, float *out_ptr)
@@ -61,6 +72,7 @@ namespace app
                 return this->getSignalData(offset, length, out_ptr);
             };
 
+            // Run DSP + inference pipeline; result holds per-label scores.
             EI_IMPULSE_ERROR err = run_classifier(&signal, &result, false);
             if (err != EI_IMPULSE_OK)
             {
@@ -70,6 +82,7 @@ namespace app
             return true;
         }
 
+        /// Prints classifier results via `ei_print_results`.
         void handleResult() override
         {
             ei_print_results(&ei_default_impulse, &result);

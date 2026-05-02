@@ -13,14 +13,14 @@ The app loads a bundled test image, runs a single inference, logs memory usage a
 
 If `idf.py` is unavailable, source `~/.espressif/v5.5.4/esp-idf/export.sh` first.
 
-Note: Default build (ie. when no `PRJ_BUILD_TARGET` is provided) is Wokwi.
+Note: Default build (ie. when no `PRJ_TARGET` is provided) is Wokwi.
 
 ### Wokwi
 
 Build:
 
 ```bash
-rm -rf sdkconfig build/ && PRJ_BUILD_TARGET=wokwi idf.py build
+rm -rf sdkconfig build/ && PRJ_TARGET=wokwi idf.py build
 ```
 
 Run:
@@ -34,7 +34,7 @@ wokwi-cli . --timeout 150000 --fail-text "Backtrace:" --expect-text "main_task: 
 Build:
 
 ```bash
-rm -rf sdkconfig build/ && PRJ_BUILD_TARGET=esp32s3 idf.py build
+rm -rf sdkconfig build/ && PRJ_TARGET=esp32s3 idf.py build
 ```
 
 Run:

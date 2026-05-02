@@ -1,4 +1,8 @@
 
+// Entry point for the Edge Impulse keyword-spotting demo.
+// Iterates over pre-recorded PCM clips via AppFeed, runs the EI classifier
+// through AppInference for each clip, and prints the label scores.
+
 #include "esp_log.h"
 #include "sdkconfig.h"
 

@@ -8,7 +8,7 @@ Note: It runs on board-esp32-devkit-c-v4, NOT an ESP32-S3 device.
 Build:
 
 ```bash
-rm -rf sdkconfig build/ && PRJ_BUILD_TARGET=wokwi idf.py build
+rm -rf sdkconfig build/ && PRJ_TARGET=wokwi idf.py build
 ```
 
 Run:
@@ -22,7 +22,7 @@ wokwi-cli . --timeout 120000 --fail-text "Backtrace:" --expect-text "Returned fr
 Build:
 
 ```bash
-rm -rf sdkconfig build/ && PRJ_BUILD_TARGET=esp32s3 idf.py build
+rm -rf sdkconfig build/ && PRJ_TARGET=esp32s3 idf.py build
 ```
 
 Run:
