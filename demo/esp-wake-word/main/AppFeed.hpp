@@ -1,3 +1,6 @@
+// AppFeed — streams the bundled offline PCM sample (data/hiesp.h) to the
+// inference pipeline in model-sized chunks via next().
+
 #pragma once
 
 #include <cstdlib>

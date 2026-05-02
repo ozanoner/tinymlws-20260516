@@ -6,6 +6,11 @@
 
 ### Using Wokwi
 
+## IDF components
+- https://components.espressif.com/components/espressif/esp-sr/versions/2.4.3/readme
+- https://components.espressif.com/components/ozanoner/edgeimpulse-inference-sdk/versions/0.1.1/readme
+
+
 ## Assignments
 
 1. Edge Impulse keyword spotting
@@ -16,3 +21,4 @@
 6. Espressif face detection
 
 ## References
+

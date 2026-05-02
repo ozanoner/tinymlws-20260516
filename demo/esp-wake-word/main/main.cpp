@@ -1,4 +1,7 @@
 
+// Entry point for the ESP-SR wake-word detection demo.
+// Streams pre-recorded PCM audio via AppFeed and detects the "Hi ESP" wake word
+// using AppInference (WakeNet wn9s_hiesp).
 
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"

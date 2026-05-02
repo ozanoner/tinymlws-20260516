@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-const uint8_t hiesp[] = {
+static const uint8_t hiesp[] = {
     0xeb,
     0xff,
     0xe5,
