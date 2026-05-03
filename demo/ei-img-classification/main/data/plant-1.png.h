@@ -3,7 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-static const uint32_t features[] = {
+static const uint32_t features_plant1[] = {
     0x499b2f,
     0x4e9b2b,
     0x4b9228,
@@ -9221,4 +9221,3 @@ static const uint32_t features[] = {
     0x9cb8b9,
     0x719a8a,
 };
-

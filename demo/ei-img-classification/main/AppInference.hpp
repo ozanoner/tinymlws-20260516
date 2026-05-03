@@ -40,7 +40,7 @@ namespace app
         /// Returns false if @p data is null or its length doesn't match the model's input frame size.
         bool feed(const raw_data_t<uint32_t> *const data) override
         {
-            if (data == nullptr || data->length != EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE)
+            if (data == nullptr || data->length == 0)
             {
                 return false;
             }
@@ -52,7 +52,7 @@ namespace app
         /// as floats into @p out_ptr. Returns -1 if out of bounds.
         int getSignalData(size_t offset, size_t length, float *out_ptr)
         {
-            const size_t feature_count = sizeof(features) / sizeof(features[0]);
+            const size_t feature_count = EI_CLASSIFIER_RAW_SAMPLE_COUNT;
             if (offset + length > feature_count)
             {
                 return -1;
@@ -60,7 +60,7 @@ namespace app
 
             for (size_t index = 0; index < length; index++)
             {
-                out_ptr[index] = static_cast<float>(features[offset + index]);
+                out_ptr[index] = static_cast<float>(current_data->data[offset + index]);
             }
             return 0;
         }
@@ -69,7 +69,7 @@ namespace app
         bool run() override
         {
             signal_t signal;
-            signal.total_length = sizeof(features) / sizeof(features[0]);
+            signal.total_length = EI_CLASSIFIER_RAW_SAMPLE_COUNT;
             signal.get_data = [this](size_t offset, size_t length, float *out_ptr)
             {
                 return this->getSignalData(offset, length, out_ptr);
@@ -102,11 +102,8 @@ namespace app
                          result.classification[i].value);
             }
 
-            const char *expected_label = "plant";
             const char *predicted_label = ei_classifier_inferencing_categories[top_index];
             ESP_LOGI(TAG, "Top prediction: %s (%.5f)", predicted_label, top_value);
-            ESP_LOGI(TAG, "Expected label: %s -> %s", expected_label,
-                     strcmp(predicted_label, expected_label) == 0 ? "PASS" : "FAIL");
         }
 
     private:

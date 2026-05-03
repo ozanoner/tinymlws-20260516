@@ -1,3 +1,6 @@
+// Entry point for the TFLM person-detection demo.
+// Iterates over bundled grayscale frames via AppFeed and classifies each
+// using AppInference (TFLite Micro person_detect model).
 
 #include "esp_log.h"
 

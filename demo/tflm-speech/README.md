@@ -55,5 +55,8 @@ idf.py flash monitor -p /dev/ttyACM0
 
 ## References
 - https://ai.google.dev/edge/litert/microcontrollers/overview
-- https://code.vt.edu/thomaspj1017/tflite-micro/-/tree/main/tensorflow/lite/micro/examples/micro_speech
+- https://github.com/tensorflow/tflite-micro/blob/main/tensorflow/lite/micro/examples/person_detection/training_a_model.md
+- https://github.com/tensorflow/tflite-micro/blob/main/tensorflow/lite/micro/examples/micro_speech/train/train_micro_speech_model.ipynb
 - https://github.com/espressif/esp-tflite-micro/tree/master/examples/micro_speech
+- https://code.vt.edu/thomaspj1017/tflite-micro/-/tree/main/tensorflow/lite/micro/examples/micro_speech
+
