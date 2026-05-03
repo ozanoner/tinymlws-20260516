@@ -18,10 +18,16 @@
 3. Tensorflow Lite Micro speech
 4. Tensorflow Lite Micro person detection
 5. Espressif Wake-word detection
+switch to hilexin
+
 6. Espressif face detection
 
 ## Tests
 - Change treshold and see the result
+
+
+## What is next?
+- Try examples on real hardware
 
 ## References
 
