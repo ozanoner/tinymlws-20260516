@@ -1,3 +1,5 @@
+// Entry point for the TFLM speech demo.
+// Repeatedly runs offline keyword spotting over bundled yes/no audio clips.
 
 #include "esp_log.h"
 #include "sdkconfig.h"

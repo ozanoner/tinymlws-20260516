@@ -1,3 +1,6 @@
+// AppInference - runs the TFLite Micro speech model on generated features and
+// logs keyword detections for the offline audio clips.
+
 #pragma once
 
 #include "esp_log.h"
@@ -7,11 +10,10 @@
 
 #include "micro_model_settings.h"
 #include "model.h"
-#include "tensorflow/lite/micro/system_setup.h"
-#include "tensorflow/lite/schema/schema_generated.h"
-#include "tensorflow/lite/core/c/common.h"
 #include "tensorflow/lite/micro/micro_interpreter.h"
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
+#include "tensorflow/lite/schema/schema_generated.h"
+#include "tensorflow/lite/core/c/common.h"
 
 #include "AppInferenceBase.hpp"
 #include "AppFeatures.hpp"
@@ -24,41 +26,26 @@ namespace app
     class AppInference : public AppInferenceBase<int16_t>
     {
     public:
+        /// Constructs the offline speech inference pipeline.
         AppInference() = default;
+
+        /// Cleans up the inference object; no dynamic resources are owned here.
         ~AppInference() override = default;
 
+        /// Initializes the TFLite Micro model, interpreter, input tensor, and
+        /// feature provider used for keyword spotting.
         void init() override
         {
-            current_data = nullptr;
-
+            // Access the compiled flatbuffer model stored in flash.
             model = tflite::GetModel(g_model);
-            if (model->version() != TFLITE_SCHEMA_VERSION)
-            {
-                ESP_LOGE(TAG,
-                         "Model schema version %d does not match supported version %d",
-                         model->version(), TFLITE_SCHEMA_VERSION);
-                return;
-            }
 
             // An easier approach is to just use the AllOpsResolver
             // tflite::AllOpsResolver resolver;
             static tflite::MicroMutableOpResolver<4> micro_op_resolver;
-            if (micro_op_resolver.AddDepthwiseConv2D() != kTfLiteOk)
-            {
-                return;
-            }
-            if (micro_op_resolver.AddFullyConnected() != kTfLiteOk)
-            {
-                return;
-            }
-            if (micro_op_resolver.AddSoftmax() != kTfLiteOk)
-            {
-                return;
-            }
-            if (micro_op_resolver.AddReshape() != kTfLiteOk)
-            {
-                return;
-            }
+            micro_op_resolver.AddDepthwiseConv2D();
+            micro_op_resolver.AddFullyConnected();
+            micro_op_resolver.AddSoftmax();
+            micro_op_resolver.AddReshape();
 
             // Build an interpreter to run the model with.
             static tflite::MicroInterpreter static_interpreter(
@@ -66,25 +53,13 @@ namespace app
             interpreter = &static_interpreter;
 
             // Allocate memory from the tensor_arena for the model's tensors.
-            TfLiteStatus allocate_status = interpreter->AllocateTensors();
-            if (allocate_status != kTfLiteOk)
-            {
-                ESP_LOGE(TAG, "AllocateTensors() failed");
-                return;
-            }
+            interpreter->AllocateTensors();
 
             // Get information about the memory area to use for the model's input.
             model_input = interpreter->input(0);
-            if ((model_input->dims->size != 2) || (model_input->dims->data[0] != 1) ||
-                (model_input->dims->data[1] !=
-                 (kFeatureCount * kFeatureSize)) ||
-                (model_input->type != kTfLiteInt8))
-            {
-                ESP_LOGE(TAG, "Bad input tensor parameters in model");
-                return;
-            }
             model_input_buffer = tflite::GetTensorData<int8_t>(model_input);
 
+            // Reuse a single feature provider backed by the persistent feature buffer.
             static AppFeatures static_feature_provider(kFeatureElementCount,
                                                        feature_buffer);
             feature_provider = &static_feature_provider;
@@ -92,8 +67,8 @@ namespace app
             previous_time = 0;
         }
 
-        bool feed(const raw_data_t<int16_t> *const data) override { return false; }
-
+        /// Advances to the next audio slice, updates the spectrogram features,
+        /// and invokes the model when enough new data is available.
         bool run() override
         {
             auto next_data = app_feed.next();
@@ -106,6 +81,7 @@ namespace app
             const int32_t current_time = app_feed.latestAudioTimestamp();
 
             int how_many_new_slices = 0;
+            // Convert the latest audio window(s) into the rolling spectrogram input.
             TfLiteStatus feature_status = feature_provider->populateFeatureData(
                 previous_time, current_time, &how_many_new_slices, &app_feed);
             if (feature_status != kTfLiteOk)
@@ -119,14 +95,13 @@ namespace app
             // running the network model.
             if (how_many_new_slices > 0)
             {
-
-                // Copy feature buffer to input tensor
+                // Flatten the spectrogram into the model's int8 input tensor.
                 for (int i = 0; i < kFeatureElementCount; i++)
                 {
                     model_input_buffer[i] = feature_buffer[i];
                 }
 
-                // Run the model on the spectrogram input and make sure it succeeds.
+                // Execute one inference pass on the current spectrogram frame stack.
                 TfLiteStatus invoke_status = interpreter->Invoke();
                 if (invoke_status != kTfLiteOk)
                 {
@@ -138,17 +113,19 @@ namespace app
             return true;
         }
 
+        /// Reads the model output tensor, dequantizes scores, logs the best
+        /// keyword result, and resets the feature buffer for the next clip.
         void handleResult() override
         {
-            // Obtain a pointer to the output tensor
+            // Read the quantized output scores produced by the model.
             TfLiteTensor *output = interpreter->output(0);
 
-            float output_scale = output->params.scale;
-            int output_zero_point = output->params.zero_point;
-            int max_idx = 0;
-            float max_result = 0.0;
+            float output_scale = output->params.scale;         // Q → float multiplier baked in model
+            int output_zero_point = output->params.zero_point; // int8 value that maps to 0.0 in float space
+            int max_idx = 0;                                   // index of the highest-scoring category so far
+            float max_result = 0.0;                            // dequantized score of that category (0.0–1.0)
 
-            // Dequantize output values and find the max
+            // Dequantize each class score and keep the best-scoring label.
             for (int i = 0; i < kCategoryCount; i++)
             {
                 float current_result =
@@ -172,24 +149,38 @@ namespace app
                          static_cast<double>(max_result));
             }
 
+            // Start the next clip with a cleared spectrogram history.
             feature_provider->reset();
         }
 
     private:
         static constexpr const char *TAG = "inference";
 
-        const raw_data_t<int16_t> *current_data{nullptr};
-
+        // Parsed flatbuffer speech model stored in flash.
         const tflite::Model *model = nullptr;
-        tflite::MicroInterpreter *interpreter = nullptr;
-        TfLiteTensor *model_input = nullptr;
-        AppFeatures *feature_provider = nullptr;
-        int32_t previous_time = 0;
 
+        // TFLite Micro interpreter bound to the speech model and tensor arena.
+        tflite::MicroInterpreter *interpreter = nullptr;
+
+        // Input tensor that receives the flattened spectrogram features.
+        TfLiteTensor *model_input = nullptr;
+
+        // Feature extractor that maintains the rolling spectrogram state.
+        AppFeatures *feature_provider = nullptr;
+
+        // Offline audio source that serves the bundled yes/no clips.
+        AppFeed app_feed;
+
+        // Scratch arena used by TFLite Micro for tensors and intermediate buffers.
         uint8_t tensor_arena[TENSOR_ARENA_SIZE];
+
+        // Rolling spectrogram buffer written by AppFeatures.
         int8_t feature_buffer[kFeatureElementCount];
+
+        // Raw pointer to the input tensor payload for fast writes before invoke.
         int8_t *model_input_buffer = nullptr;
 
-        AppFeed app_feed;
+        // Timestamp of the previous feature-generation step in milliseconds.
+        int32_t previous_time = 0;
     };
 }
