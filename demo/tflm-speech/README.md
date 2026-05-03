@@ -1,12 +1,13 @@
 # TFLite Micro Speech example
 
-Keyword-spotting demo using TensorFlow Lite for Microcontrollers on an ESP32-S3.
-The model recognises four categories — **silence**, **unknown**, **yes**, and **no** — from 16 kHz PCM audio.
+Offline keyword-spotting demo for ESP32-S3 using TensorFlow Lite for Microcontrollers.
+The int8 model recognises four categories from 16 kHz PCM audio: **silence**, **unknown**, **yes**, and **no**.
 
-- In offline/simulation mode two 1-second pre-recorded clips (`no_1000ms.wav` and `yes_1000ms.wav`) are fed to the pipeline sequentially through `AppFeed`.
-- Each clip is sliced into strides with feature window.
-- `AppFeatures` converts each slice into a log-mel spectrogram and accumulates slices into the  input tensor expected by the model.
-- `AppInference` runs the int8 TFLite Micro interpreter and logs any detection whose softmax score exceeds 0.80.
+`AppFeed` plays two bundled 1-second clips (`no_1000ms.wav` and `yes_1000ms.wav`) sequentially and serves overlapping audio windows to the feature pipeline.
+`AppFeatures` converts each 30 ms window with a 20 ms stride into log-mel features and accumulates a 49 x 40 spectrogram for inference.
+`AppInference` runs the TFLite Micro interpreter and logs detections whose score exceeds `0.80`.
+
+Use [tools/wavtoh.sh](/workspaces/tools/wavtoh.sh) to convert a WAV file into a C++ header for additional bundled test clips.
 
 ## Project structure
 
@@ -29,7 +30,7 @@ main/
 Build:
 
 ```bash
-rm -rf sdkconfig build/ && PRJ_BUILD_TARGET=wokwi idf.py build
+rm -rf sdkconfig build/ && PRJ_TARGET=wokwi idf.py build
 ```
 
 Run:
@@ -43,7 +44,7 @@ wokwi-cli . --timeout 120000 --fail-text "Backtrace:" --expect-text "Returned fr
 Build:
 
 ```bash
-rm -rf sdkconfig build/ && PRJ_BUILD_TARGET=esp32s3 idf.py build
+rm -rf sdkconfig build/ && PRJ_TARGET=esp32s3 idf.py build
 ```
 
 Run:
@@ -54,5 +55,9 @@ idf.py flash monitor -p /dev/ttyACM0
 
 
 ## References
-- https://code.vt.edu/thomaspj1017/tflite-micro/-/tree/main/tensorflow/lite/micro/examples/micro_speech
+- https://ai.google.dev/edge/litert/microcontrollers/overview
+- https://github.com/tensorflow/tflite-micro/blob/main/tensorflow/lite/micro/examples/person_detection/training_a_model.md
+- https://github.com/tensorflow/tflite-micro/blob/main/tensorflow/lite/micro/examples/micro_speech/train/train_micro_speech_model.ipynb
 - https://github.com/espressif/esp-tflite-micro/tree/master/examples/micro_speech
+- https://code.vt.edu/thomaspj1017/tflite-micro/-/tree/main/tensorflow/lite/micro/examples/micro_speech
+

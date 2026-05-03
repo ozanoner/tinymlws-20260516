@@ -16,22 +16,21 @@ namespace app
         }
         const raw_data_t<int16_t> *next() override
         {
-            if (current_index >= data_len)
+            ++current_index;
+            if (current_index >= data_cnt)
             {
-                return &no_data; // No more data
+                return nullptr;
             }
-            return &data[current_index++];
+            return &data[current_index];
         }
 
     private:
         static constexpr raw_data_t<int16_t> data[] = {
             {kOfflineKeywordSample_gm, kOfflineKeywordSampleLength_gm},
             {kOfflineKeywordSample_unknown, kOfflineKeywordSampleLength_unknown}};
-        static const size_t data_len = sizeof(data) / sizeof(data[0]);
+        static const size_t data_cnt = sizeof(data) / sizeof(data[0]);
 
-        static constexpr raw_data_t<int16_t> no_data{nullptr, 0};
-
-        size_t current_index = 0;
+        int current_index = -1;
     };
 
 }

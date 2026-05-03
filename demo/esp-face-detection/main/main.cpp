@@ -1,3 +1,6 @@
+// Entry point for the ESP face-detection demo.
+// Iterates over bundled RGB frames via AppFeed and detects human faces
+// using AppInference (HumanFaceDetect / ESP-DL).
 
 #include "esp_log.h"
 #include "sdkconfig.h"

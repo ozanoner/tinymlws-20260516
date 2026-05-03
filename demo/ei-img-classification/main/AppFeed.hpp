@@ -1,7 +1,13 @@
 
+// AppFeed — image data source for the EI image classification pipeline.
+// Exposes bundled test images (offline_sample.h) one at a time via next().
+
 #pragma once
 
-#include "data/offline_sample.h"
+#include "offline_sample.h"
+#include "plant-1.png.h"
+#include "plant-2.png.h"
+#include "lamp-1.png.h"
 #include "AppFeedBase.hpp"
 
 namespace app
@@ -15,21 +21,42 @@ namespace app
         }
         const raw_data_t<uint32_t> *next() override
         {
+            ++current_index;
             if (current_index >= data_len)
             {
-                return &no_data; // No more data
+                return nullptr;
             }
-            return &data[current_index++];
+            return &data[current_index];
+        }
+
+        const char *getExpectedLabel()
+        {
+            if (current_index >= data_len)
+            {
+                return nullptr;
+            }
+            return expected_labels[current_index];
         }
 
     private:
+        static constexpr const char *TAG = "feed";
+
         static constexpr raw_data_t<uint32_t> data[] = {
-            {features, sizeof(features) / sizeof(features[0])}};
+            {features_p0, sizeof(features_p0) / sizeof(features_p0[0])},
+            {features_plant1, sizeof(features_plant1) / sizeof(features_plant1[0])},
+            {features_plant2, sizeof(features_plant2) / sizeof(features_plant2[0])},
+            {features_lamp1, sizeof(features_lamp1) / sizeof(features_lamp1[0])},
+        };
         static const size_t data_len = sizeof(data) / sizeof(data[0]);
 
-        static constexpr raw_data_t<uint32_t> no_data{nullptr, 0};
+        static constexpr const char *expected_labels[] = {
+            "plant",
+            "plant",
+            "plant",
+            "lamp",
+        };
 
-        size_t current_index = 0;
+        int current_index = -1;
     };
 
 }

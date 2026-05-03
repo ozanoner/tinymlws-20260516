@@ -1,3 +1,6 @@
+// AppFeed — image source for the face-detection pipeline.
+// Exposes the five bundled 160x120 RGB888 frames (data/offline_frames.hpp)
+// one at a time via next().
 
 #pragma once
 
@@ -18,7 +21,7 @@ namespace app
             ++current_index;
             if (current_index >= OFFLINE_FRAME_COUNT)
             {
-                return &no_data; // No more data
+                return nullptr;
             }
             return &frames[current_index];
         }
@@ -32,8 +35,6 @@ namespace app
             {kOfflineFrameRgb[3], frame_size},
             {kOfflineFrameRgb[4], frame_size},
         };
-
-        static constexpr raw_data_t<uint8_t> no_data{nullptr, 0};
 
         int current_index = -1;
     };

@@ -1,8 +1,11 @@
+// AppInference — runs the TFLite Micro person-detection model on an ESP32-S3.
+// Classifies 96x96 int8 grayscale frames as 'person' or 'no person' and logs
+// the top label with its score.
+
 #pragma once
 
 #include <algorithm>
 #include "esp_log.h"
-
 #include "model_settings.h"
 #include "person_detect_model_data.h"
 #include "tensorflow/lite/micro/micro_interpreter.h"
@@ -19,6 +22,7 @@ namespace app
         // Initialize the inference engine, load the model, etc.
         void init() override
         {
+            // Map the compiled model flatbuffer and verify its schema version.
             model = tflite::GetModel(g_person_detect_model_data);
             if (model->version() != TFLITE_SCHEMA_VERSION)
             {
@@ -27,6 +31,7 @@ namespace app
                 return;
             }
 
+            // Allocate the tensor arena used as working memory for tensors at runtime.
             if (tensor_arena == nullptr)
             {
                 tensor_arena = (uint8_t *)malloc(kTensorArenaSize);
@@ -37,6 +42,7 @@ namespace app
                 return;
             }
 
+            // Register only the ops used by this model to minimise flash footprint.
             static tflite::MicroMutableOpResolver<5> micro_op_resolver;
             micro_op_resolver.AddAveragePool2D();
             micro_op_resolver.AddConv2D();
@@ -44,10 +50,12 @@ namespace app
             micro_op_resolver.AddReshape();
             micro_op_resolver.AddSoftmax();
 
+            // Build the interpreter and bind it to the tensor arena.
             static tflite::MicroInterpreter static_interpreter(
                 model, micro_op_resolver, tensor_arena, kTensorArenaSize);
             interpreter = &static_interpreter;
 
+            // Allocate memory for all tensors in the arena.
             TfLiteStatus allocate_status = interpreter->AllocateTensors();
             if (allocate_status != kTfLiteOk)
             {
@@ -102,14 +110,6 @@ namespace app
         tflite::MicroInterpreter *interpreter{nullptr};
         TfLiteTensor *input{nullptr};
 
-        // In order to use optimized tensorflow lite kernels, a signed int8_t quantized
-        // model is preferred over the legacy unsigned model format. This means that
-        // throughout this project, input images must be converted from unisgned to
-        // signed format. The easiest and quickest way to convert from unsigned to
-        // signed 8-bit integers is to subtract 128 from the unsigned value to get a
-        // signed value.
-
-        // CONFIG_NN_OPTIMIZED
         const int scratchBufSize{60 * 1024};
         // An area of memory to use for input, output, and intermediate arrays.
         // Keeping allocation on bit larger size to accomodate future needs.

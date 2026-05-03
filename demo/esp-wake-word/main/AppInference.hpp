@@ -1,3 +1,6 @@
+// AppInference — loads the WakeNet wn9s_hiesp model from the 'model' partition
+// and detects the "Hi ESP" wake word in each incoming PCM chunk.
+
 #pragma once
 
 #include <cstdlib>
@@ -11,10 +14,14 @@
 
 namespace app
 {
+    /// Wraps the ESP-SR WakeNet model lifecycle and performs wake-word detection
+    /// on successive PCM audio chunks provided by AppFeed.
     class AppInference : public AppInferenceBase<int16_t>
     {
     public:
         AppInference() = default;
+
+        /// Releases the WakeNet model instance if it was created.
         ~AppInference() override
         {
             if (wakenet != nullptr && model_data != nullptr)
@@ -23,6 +30,8 @@ namespace app
             }
         }
 
+        /// Loads the WakeNet model from the `model` partition and caches the
+        /// audio chunk size expected by the detector.
         void init() override
         {
             models = esp_srmodel_init("model");
@@ -56,11 +65,13 @@ namespace app
             audio_chunksize = wakenet->get_samp_chunksize(model_data) * sizeof(int16_t);
         }
 
+        /// Returns the detector input chunk size in bytes.
         int getAudioChunkSize()
         {
             return wakenet == nullptr ? 0 : wakenet->get_samp_chunksize(model_data) * sizeof(int16_t);
         }
 
+        /// Stores the next PCM chunk to be processed.
         bool feed(const raw_data_t<int16_t> *const data) override
         {
             if (data == nullptr || data->length == 0)
@@ -71,6 +82,8 @@ namespace app
             return true;
         }
 
+        /// Runs WakeNet on the current PCM chunk and records whether the wake
+        /// word was detected.
         bool run() override
         {
             wakenet_state_t state = wakenet->detect(model_data, const_cast<int16_t *>(current_data->data));
@@ -81,6 +94,7 @@ namespace app
             return true;
         }
 
+        /// Logs the detection result and clears the one-shot detected flag.
         void handleResult() override
         {
             if (detected)
