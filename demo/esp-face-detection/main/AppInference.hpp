@@ -1,3 +1,6 @@
+// AppInference — wraps the ESP-DL HumanFaceDetect model.
+// Accepts one RGB888 frame at a time and logs detected face scores via run().
+
 #pragma once
 
 #include <list>
@@ -24,14 +27,16 @@ namespace app
             }
         }
 
+        /// Creates the HumanFaceDetect model and sets the score threshold for both stages.
         void init() override
         {
             model = new HumanFaceDetect(
                 static_cast<HumanFaceDetect::model_type_t>(CONFIG_DEFAULT_HUMAN_FACE_DETECT_MODEL), false);
-            model->set_score_thr(0.7F, 0);
-            model->set_score_thr(0.7F, 1);
+            model->set_score_thr(score_threshold, 0);
+            // model->set_score_thr(score_threshold, 1);
         }
 
+        /// Stores @p data as the frame for the next `run()` call.
         bool feed(const raw_data_t<uint8_t> *const data) override
         {
             if (data == nullptr || data->data == nullptr || data->length == 0)
@@ -42,6 +47,7 @@ namespace app
             return true;
         }
 
+        /// Wraps the current frame in a `dl::image::img_t` and runs the face detector.
         bool run() override
         {
             if (current_data == nullptr)
@@ -61,6 +67,7 @@ namespace app
             return true;
         }
 
+        /// Logs each detected face's label and score, or "No detection" if none found.
         void handleResult() override
         {
             if (result.empty())
@@ -80,6 +87,7 @@ namespace app
 
     private:
         static constexpr const char *TAG = "inference";
+        static constexpr float score_threshold = 0.7F;
 
         HumanFaceDetect *model{nullptr};
         const raw_data_t<uint8_t> *current_data{nullptr};

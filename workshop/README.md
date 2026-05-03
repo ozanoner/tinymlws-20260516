@@ -20,5 +20,8 @@
 5. Espressif Wake-word detection
 6. Espressif face detection
 
+## Tests
+- Change treshold and see the result
+
 ## References
 
