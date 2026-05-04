@@ -56,7 +56,8 @@ idf.py flash monitor -p /dev/ttyACM0
 ```
 
 ## References
+
 - https://github.com/tensorflow/tflite-micro/tree/main
+- https://github.com/tensorflow/tflite-micro/blob/main/tensorflow/lite/micro/examples/person_detection/training_a_model.md
 - https://github.com/espressif/esp-tflite-micro/tree/master/examples/person_detection
 https://github.com/tensorflow/tflite-micro/tree/main/tensorflow/lite/micro/examples/person_detection
-- https://code.vt.edu/thomaspj1017/tflite-micro/-/tree/main/tensorflow/lite/micro/examples/micro_speech

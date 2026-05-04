@@ -1,0 +1,12 @@
+idf_component_register(SRCS "main.cpp"
+            model/micro_features_generator.cc
+            model/model.cc
+            model/ringbuf.c
+    INCLUDE_DIRS "." data model ../../common)
+
+target_compile_options(${COMPONENT_LIB} PRIVATE
+    -Wno-maybe-uninitialized
+    -Wno-missing-field-initializers
+    -Wno-error=sign-compare
+    -Wno-error=double-promotion
+    -Wno-type-limits)        
