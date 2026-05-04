@@ -30,7 +30,7 @@ extern "C" void app_main()
             ESP_LOGW(TAG, "No more data to feed");
             break;
         }
-        if (!inference.run())
+        if (!APP_RUN_WITH_TIMING(TAG, inference.run()))
         {
             ESP_LOGE(TAG, "Failed to run inference");
             break;

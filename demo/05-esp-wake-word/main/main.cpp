@@ -35,6 +35,5 @@ extern "C" void app_main(void)
             break;
         }
         inference.handleResult();
-        vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
