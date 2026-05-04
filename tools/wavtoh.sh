@@ -17,10 +17,14 @@ OUTPUT="$2"
 TMP_RAW=$(mktemp)
 
 # Convert WAV -> raw PCM (16-bit, mono, 16kHz)
-ffmpeg -y -i "$INPUT" -f s16le -acodec pcm_s16le -ac 1 -ar 16000 "$TMP_RAW" 
+ffmpeg -y -i "$INPUT" -af "apad" -t 1 -f s16le -acodec pcm_s16le -ac 1 -ar 16000 "$TMP_RAW"
 
 # Generate header file
 {
+    echo "#pragma once"
+    echo "#include <cstddef>"
+    echo "#include <cstdint>"
+    echo ""
     echo "static const int16_t kOfflineKeywordSample[] = {"
 
     hexdump -v -e '1/2 "%d,\n"' "$TMP_RAW"

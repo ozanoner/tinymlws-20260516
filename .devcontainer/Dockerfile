@@ -9,6 +9,7 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
 RUN echo "source /opt/esp/idf/export.sh > /dev/null 2>&1" >> ~/.bashrc
 RUN echo "set -o vi" >> ~/.bashrc
+RUN echo "export PATH=\"/workspaces/tools:\$PATH\"" >> ~/.bashrc
 
 RUN git config --global core.editor vi
 

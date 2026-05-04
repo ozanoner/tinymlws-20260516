@@ -55,6 +55,7 @@ idf.py flash monitor -p /dev/ttyACM0
 
 
 ## References
+- https://www.tensorflow.org/tutorials/audio/simple_audio#run_inference_on_an_audio_file
 - https://ai.google.dev/edge/litert/microcontrollers/overview
 - https://github.com/tensorflow/tflite-micro/blob/main/tensorflow/lite/micro/examples/person_detection/training_a_model.md
 - https://github.com/tensorflow/tflite-micro/blob/main/tensorflow/lite/micro/examples/micro_speech/train/train_micro_speech_model.ipynb
