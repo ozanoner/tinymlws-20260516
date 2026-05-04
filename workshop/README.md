@@ -1,14 +1,48 @@
 # TinyML Workshop
 
+Hands-on workshop to build, run, and iterate TinyML/Edge AI demos on ESP32-S3 using ESP-IDF and Wokwi.
+
 ## Prerequisites
+
+Workshop details: https://www.eventbrite.co.uk/e/deploy-edgeai-applications-with-esp32-s3-a-hands-on-tinyml-workshop-tickets-1985133871849
+
+- Install Docker, Git and VS Code on your host machine (as noted in the event page).
+- The devcontainer already includes the required ESP-IDF toolchain and utilities.
 
 ### Using the ESP-IDF toolchain
 
+From each project folder, use the following commands to build the examples:
+
+```bash
+# Wokwi-oriented build (default)
+idf.py build
+
+# Build (use target config from PRJ_TARGET)
+PRJ_TARGET=esp32s3 idf.py build
+
+# Flash + monitor on hardware
+PRJ_TARGET=esp32s3 idf.py flash monitor -p /dev/ttyACM0
+```
+
 ### Using Wokwi
 
-## IDF components
-- https://components.espressif.com/components/espressif/esp-sr/versions/2.4.3/readme
-- https://components.espressif.com/components/ozanoner/edgeimpulse-inference-sdk/versions/0.1.1/readme
+- Edit `diagram.json` to add/adjust virtual peripherals (for example LEDs).
+- Use Wokwi logs/serial output to validate model detections.
+
+
+Client usage:
+
+```bash
+# Run simulation (requires wokwi.toml and diagram.json)
+wokwi-cli 
+```
+
+Common parameters:
+```
+--timeout <ms> (default 30000ms): exits when timeout
+--fail-text <text>: exits when fail-text encountered
+--expect-text: exits when expect-text encountered
+```
 
 
 ## Assignments
@@ -18,7 +52,7 @@
     ```bash
     $ wavtoh.sh good-morning.flac good-morning.flac.h
     ```
-2. Add an LED in the Wokwi diagram. Signal it when the keyword detected.
+2. Add an LED in the Wokwi diagram. Signal it when the keyword is detected.
 
 
 ### 02 Edge Impulse image classification
@@ -30,7 +64,7 @@
     ```
 
 ### 03 Tensorflow Lite Micro speech
-1. Record and convert an audio file ("yes") to a header. Integrate in the app.
+1. Record and convert an audio file ("yes") to a header. Integrate it in the app.
 2. Modify `AppFeed.hpp` to return the "yes" data every time (no nullptr return).
 3. Modify `AppInference.hpp`:
     - Parameterize the detection threshold in the `run` function
@@ -48,17 +82,30 @@
     ```
 
 ### 05 Espressif Wake-word detection
-1. Test the app with the hilexin data (detection should fail)
-2. Configure the app for hilexin and test
+1. Test the app with the hilexin data (detection should fail).
+2. Configure the app for hilexin and test.
 
-### Espressif face detection
-Hardware only.
+### 06 Espressif face detection
+Hardware only - no assignment
 
 ## What is next?
-- Try examples on real hardware
+Try examples on real hardware.
+
+Some devkits that you can use:
+- ESP32-S3-EYE: https://github.com/espressif/esp-who/blob/master/docs/en/get-started/ESP32-S3-EYE_Getting_Started_Guide.md
+- XIAO ESP32S3 Sense: https://www.seeedstudio.com/XIAO-ESP32S3-Sense-p-5639.html
 
 ## References
 
+Espressif AIoT:
+- https://docs.espressif.com/projects/esp-techpedia/en/latest/esp-friends/solution-introduction/ai/ai-solution.html
+
 TFLM:
-- https://github.com/tensorflow/tflite-micro/tree/main/tensorflow/lite/micro/examples/memory_footprint
-- 
+- https://ai.google.dev/edge/litert/microcontrollers/overview
+- https://github.com/espressif/esp-tflite-micro
+
+Edge Impulse:
+- https://docs.edgeimpulse.com/tutorials/topics/inference/run-multiple-impulses-cpp
+- https://docs.edgeimpulse.com/hardware/boards/seeed-xiao-esp32s3-sense
+- https://components.espressif.com/components/ozanoner/edgeimpulse-inference-sdk/
+
