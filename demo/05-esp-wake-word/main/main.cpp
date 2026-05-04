@@ -12,17 +12,17 @@
 
 namespace
 {
-    app::AppInference inference;
-    app::AppFeed feed;
-    constexpr const char *TAG = "app";
-}
+app::AppInference inference;
+app::AppFeed feed;
+constexpr const char* TAG = "app";
+} // namespace
 
 extern "C" void app_main(void)
 {
     inference.init();
     feed.init(inference.getAudioChunkSize());
 
-    while (const app::raw_data_t<int16_t> *data = feed.next())
+    while (const app::raw_data_t<int16_t>* data = feed.next())
     {
         if (!inference.feed(data))
         {

@@ -8,20 +8,20 @@
 #include "AppFeed.hpp"
 #include "AppInference.hpp"
 
-static constexpr const char *TAG = "app";
+static constexpr const char* TAG = "app";
 
 namespace
 {
-    app::AppInference inference;
-    app::AppFeed feed;
-}
+app::AppInference inference;
+app::AppFeed feed;
+} // namespace
 
 extern "C" void app_main()
 {
     feed.init();
     inference.init();
 
-    while (const app::raw_data_t<uint8_t> *data = feed.next())
+    while (const app::raw_data_t<uint8_t>* data = feed.next())
     {
         ESP_LOGI(TAG, ">> Feeding data to inference");
         if (!inference.feed(data))

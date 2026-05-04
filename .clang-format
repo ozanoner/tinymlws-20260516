@@ -1,0 +1,28 @@
+---
+# Global clang-format config for this repository.
+# Intended for C/C++ sources in app code; nested third-party folders may keep
+# their own local .clang-format files.
+BasedOnStyle: LLVM
+Language: Cpp
+Standard: c++17
+
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 100
+
+BreakBeforeBraces: Allman
+NamespaceIndentation: None
+
+PointerAlignment: Left
+DerivePointerAlignment: false
+SpaceBeforeParens: ControlStatements
+
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+AllowShortFunctionsOnASingleLine: Empty
+
+SortIncludes: true
+IncludeBlocks: Preserve
+ReflowComments: true
