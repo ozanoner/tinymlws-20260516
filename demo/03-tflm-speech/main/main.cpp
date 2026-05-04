@@ -6,11 +6,11 @@
 
 #include "AppInference.hpp"
 
-static constexpr const char *TAG = "kws";
+static constexpr const char* TAG = "kws";
 
 namespace
 {
-    app::AppInference inference;
+app::AppInference inference;
 }
 
 extern "C" void app_main()
