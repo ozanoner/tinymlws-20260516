@@ -102,10 +102,19 @@ namespace app
                 }
 
                 // Execute one inference pass on the current spectrogram frame stack.
-                TfLiteStatus invoke_status = interpreter->Invoke();
-                if (invoke_status != kTfLiteOk)
+                auto do_invoke = [&]() -> bool
                 {
-                    ESP_LOGE(TAG, "Invoke failed");
+                    TfLiteStatus invoke_status = interpreter->Invoke();
+                    if (invoke_status != kTfLiteOk)
+                    {
+                        ESP_LOGE(TAG, "Invoke failed");
+                        return false;
+                    }
+                    return true;
+                };
+
+                if (!APP_RUN_WITH_TIMING(TAG, do_invoke()))
+                {
                     return false;
                 }
             }
