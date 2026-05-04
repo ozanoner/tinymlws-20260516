@@ -45,7 +45,9 @@ Common parameters:
 ```
 
 
-## Assignments
+## Exercises
+
+Update the example projects in [../demo](../demo) as described:
 
 ### 01 Edge Impulse keyword spotting
 1. Record and convert an audio file ("good morning") to a header. Integrate it in the app.
