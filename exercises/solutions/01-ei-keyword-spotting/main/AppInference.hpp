@@ -8,6 +8,7 @@
 #include "esp_log.h"
 #include "model-parameters/model_metadata.h"
 
+#include "AppIndicator.hpp"
 #include "AppInferenceBase.hpp"
 
 namespace app
@@ -30,6 +31,7 @@ class AppInference : public AppInferenceBase<int16_t>
         ESP_LOGI(TAG, "Labels: %d", EI_CLASSIFIER_LABEL_COUNT);
 
         current_data = nullptr;
+        indicator.init();
     }
 
     /// Stores @p data as the source for the next `run()` call.
@@ -84,6 +86,15 @@ class AppInference : public AppInferenceBase<int16_t>
     void handleResult() override
     {
         ei_print_results(&ei_default_impulse, &result);
+
+        if (result.classification[0].value > .3)
+        {
+            indicator.blink();
+        }
+        else
+        {
+            ESP_LOGI(TAG, "Keyword not detected");
+        }
     }
 
   private:
@@ -91,5 +102,6 @@ class AppInference : public AppInferenceBase<int16_t>
 
     const raw_data_t<int16_t>* current_data{nullptr};
     ei_impulse_result_t result{};
+    AppIndicator indicator{};
 };
 } // namespace app

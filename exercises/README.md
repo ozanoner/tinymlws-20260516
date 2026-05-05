@@ -56,6 +56,9 @@ Update the example projects in [../demo](../demo) as described:
     ```
 2. Add an LED in the Wokwi diagram. Signal it when the keyword is detected.
 
+LED indicator: https://components.espressif.com/components/espressif/led_indicator/versions/2.1.2/readme?language=en
+Example: https://github.com/espressif/esp-iot-solution/blob/master/examples/indicator/gpio/main/main.c
+
 
 ### 02 Edge Impulse image classification
 1. Clone the project at https://studio.edgeimpulse.com/public/96468/latest
