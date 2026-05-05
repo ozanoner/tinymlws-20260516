@@ -5,7 +5,8 @@
 
 #include "AppFeedBase.hpp"
 #include "esp_log.h"
-#include "hiesp.h"
+// #include "hiesp.h"
+#include "hilexin.h"
 #include <cstdlib>
 #include <cstring>
 
@@ -39,9 +40,9 @@ class AppFeed : public AppFeedBase<int16_t>
 
     const raw_data_t<int16_t>* next() override
     {
-        if ((chunks + 1) * audio_chunksize <= sizeof(hiesp))
+        if ((chunks + 1) * audio_chunksize <= sizeof(hilexin))
         {
-            std::memcpy(audio_buffer, hiesp + chunks * audio_chunksize, audio_chunksize);
+            std::memcpy(audio_buffer, hilexin + chunks * audio_chunksize, audio_chunksize);
             ++chunks;
             return &buffer;
         }

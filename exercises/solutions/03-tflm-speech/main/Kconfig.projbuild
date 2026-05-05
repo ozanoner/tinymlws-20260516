@@ -1,0 +1,10 @@
+menu "Application settings"
+    config DETECTION_THRESHOLD
+        int "Detection threshold (1-100%)"
+        default 50
+        range 1 100
+        help
+            Minimum score required to consider a keyword detected. 
+            Adjust this value to balance between false positives and 
+            false negatives.
+endmenu
