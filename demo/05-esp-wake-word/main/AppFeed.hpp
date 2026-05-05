@@ -52,7 +52,6 @@ class AppFeed : public AppFeedBase<int16_t>
   private:
     static constexpr const char* TAG = "app_feed";
 
-    int current_index = 0;
     size_t audio_chunksize = 0;
     int16_t* audio_buffer{nullptr};
     raw_data_t<int16_t> buffer{nullptr, 0};

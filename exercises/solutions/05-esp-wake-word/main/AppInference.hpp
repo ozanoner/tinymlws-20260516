@@ -41,10 +41,10 @@ class AppInference : public AppInferenceBase<int16_t>
             return;
         }
 
-        char* model_name = esp_srmodel_filter(models, "", "wn9s_hiesp");
+        char* model_name = esp_srmodel_filter(models, "", "wn9s_hilexin");
         if (model_name == NULL)
         {
-            ESP_LOGE(TAG, "No wake model found for hiesp");
+            ESP_LOGE(TAG, "No wake model found for hilexin");
             return;
         }
 

@@ -110,6 +110,10 @@ Espressif docs:
 1. Test the app with the hilexin data (detection should fail).
 2. Configure the app for hilexin and test.
 
+SR Component: https://components.espressif.com/components/espressif/esp-sr/
+SR Repository: https://github.com/espressif/esp-sr
+SR documentation: https://docs.espressif.com/projects/esp-sr/en/latest/esp32s3/wake_word_engine/README.html
+
 
 ### 06 Espressif face detection
 Hardware only - no assignment
