@@ -86,23 +86,7 @@ class AppInference : public AppInferenceBase<uint32_t>
     /// Logs per-label scores, the top prediction, and a PASS/FAIL check against the expected label.
     void handleResult() override
     {
-        ESP_LOGI(TAG, "Predictions:");
-        uint16_t top_index = 0;
-
-        float top_value = result.classification[0].value;
-        for (uint16_t i = 0; i < EI_CLASSIFIER_LABEL_COUNT; i++)
-        {
-            if (result.classification[i].value > top_value)
-            {
-                top_value = result.classification[i].value;
-                top_index = i;
-            }
-            ESP_LOGI(TAG, "  %s: %.5f", ei_classifier_inferencing_categories[i],
-                     result.classification[i].value);
-        }
-
-        const char* predicted_label = ei_classifier_inferencing_categories[top_index];
-        ESP_LOGI(TAG, "Top prediction: %s (%.5f)", predicted_label, top_value);
+        ei_print_results(&ei_default_impulse, &result);
     }
 
   private:

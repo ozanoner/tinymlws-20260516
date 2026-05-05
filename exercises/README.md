@@ -67,6 +67,9 @@ Example: https://github.com/espressif/esp-iot-solution/blob/master/examples/indi
     ```bash
     $ imgtoh.sh face1.png face1.png.h
     ```
+Object detection: https://docs.edgeimpulse.com/studio/projects/learning-blocks/blocks/object-detection/fomo
+
+
 
 ### 03 Tensorflow Lite Micro speech
 1. Record and convert an audio file ("yes") to a header. Integrate it in the app.

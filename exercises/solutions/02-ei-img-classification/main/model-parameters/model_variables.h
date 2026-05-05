@@ -142,7 +142,7 @@ const ei_impulse_t impulse_984069_1 = {
     .project_name = "Face detection - FOMO - Embedded Online Conference",
     .impulse_id = 1,
     .impulse_name = "Image data, Image, Object Detection (Images) #3 (Clone of version #2)",
-    .deploy_version = 17,
+    .deploy_version = 19,
 
     .nn_input_frame_size = 9216,
     .raw_sample_count = 9216,

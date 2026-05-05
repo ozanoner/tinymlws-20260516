@@ -5,9 +5,8 @@
 #pragma once
 
 #include "AppFeedBase.hpp"
-#include "lamp-1.png.h"
-#include "offline_sample.h"
-#include "plant-1.png.h"
+#include "human-1.png.h"
+#include "people-1.png.h"
 #include "plant-2.png.h"
 
 namespace app
@@ -40,18 +39,15 @@ class AppFeed : public AppFeedBase<uint32_t>
     static constexpr const char* TAG = "feed";
 
     static constexpr raw_data_t<uint32_t> data[] = {
-        {features_p0, sizeof(features_p0) / sizeof(features_p0[0])},
-        {features_plant1, sizeof(features_plant1) / sizeof(features_plant1[0])},
+        {features_human1, sizeof(features_human1) / sizeof(features_human1[0])},
+        {features_people1, sizeof(features_people1) / sizeof(features_people1[0])},
         {features_plant2, sizeof(features_plant2) / sizeof(features_plant2[0])},
-        {features_lamp1, sizeof(features_lamp1) / sizeof(features_lamp1[0])},
     };
     static const size_t data_len = sizeof(data) / sizeof(data[0]);
 
     static constexpr const char* expected_labels[] = {
+        "human",
         "plant",
-        "plant",
-        "plant",
-        "lamp",
     };
 
     int current_index = -1;

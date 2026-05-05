@@ -86,6 +86,8 @@ class AppInference : public AppInferenceBase<uint32_t>
     /// Logs per-label scores, the top prediction, and a PASS/FAIL check against the expected label.
     void handleResult() override
     {
+        ei_print_results(&ei_default_impulse, &result);
+
         ESP_LOGI(TAG, "Predictions:");
         uint16_t top_index = 0;
 
