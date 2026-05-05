@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "esp_heap_caps.h"
 #include "esp_log.h"
 #include "model_settings.h"
 #include "person_detect_model_data.h"
@@ -22,6 +23,8 @@ class AppInference : public AppInferenceBase<int8_t>
     // Initialize the inference engine, load the model, etc.
     void init() override
     {
+        printHeapUsage();
+
         // Map the compiled model flatbuffer and verify its schema version.
         model = tflite::GetModel(g_person_detect_model_data);
 
@@ -37,12 +40,13 @@ class AppInference : public AppInferenceBase<int8_t>
         }
 
         // Register only the ops used by this model to minimise flash footprint.
-        static tflite::MicroMutableOpResolver<5> micro_op_resolver;
+        static tflite::MicroMutableOpResolver<6> micro_op_resolver;
         micro_op_resolver.AddAveragePool2D();
         micro_op_resolver.AddConv2D();
         micro_op_resolver.AddDepthwiseConv2D();
         micro_op_resolver.AddReshape();
         micro_op_resolver.AddSoftmax();
+        micro_op_resolver.AddFullyConnected();
 
         // Build the interpreter and bind it to the tensor arena.
         static tflite::MicroInterpreter static_interpreter(model, micro_op_resolver, tensor_arena,
@@ -58,6 +62,9 @@ class AppInference : public AppInferenceBase<int8_t>
         }
 
         input = interpreter->input(0);
+
+        ESP_LOGI(TAG, "Person detection model arena size = %u", interpreter->arena_used_bytes());
+        printHeapUsage();
     }
     // Feed data into the inference engine, e.g., audio samples, images, etc.
     bool feed(const raw_data_t<int8_t>* const data) override
@@ -103,12 +110,21 @@ class AppInference : public AppInferenceBase<int8_t>
     tflite::MicroInterpreter* interpreter{nullptr};
     TfLiteTensor* input{nullptr};
 
-    const int scratchBufSize{60 * 1024};
     // An area of memory to use for input, output, and intermediate arrays.
     // Keeping allocation on bit larger size to accomodate future needs.
-    const int kTensorArenaSize{100 * 1024 + scratchBufSize};
+    const int kTensorArenaSize{100 * 1024};
     uint8_t* tensor_arena;
 
     const raw_data_t<int8_t>* current_data{nullptr};
+
+  private:
+    void printHeapUsage()
+    {
+        ESP_LOGI(TAG, "Free internal heap: %u",
+                 heap_caps_get_free_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT));
+
+        ESP_LOGI(TAG, "Free PSRAM heap: %u",
+                 heap_caps_get_free_size(MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT));
+    }
 };
 } // namespace app

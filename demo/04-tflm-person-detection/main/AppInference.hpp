@@ -103,10 +103,9 @@ class AppInference : public AppInferenceBase<int8_t>
     tflite::MicroInterpreter* interpreter{nullptr};
     TfLiteTensor* input{nullptr};
 
-    const int scratchBufSize{60 * 1024};
     // An area of memory to use for input, output, and intermediate arrays.
     // Keeping allocation on bit larger size to accomodate future needs.
-    const int kTensorArenaSize{100 * 1024 + scratchBufSize};
+    const int kTensorArenaSize{120 * 1024};
     uint8_t* tensor_arena;
 
     const raw_data_t<int8_t>* current_data{nullptr};

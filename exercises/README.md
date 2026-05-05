@@ -82,19 +82,34 @@ Object detection: https://docs.edgeimpulse.com/studio/projects/learning-blocks/b
     - Break the main loop when "no" detected.
 
 ### 04 Tensorflow Lite Micro person detection 
+**Goal**: Memory optimization in TinyML apps.
 1. Test with new images.
     ```bash
     $ imgtoh.sh face1.png face1.png.h -g
     ```
-2. Use `tflite::AllOpsResolver` to add the ops and compare image sizes.
+
+2. Print heap usage by using `heap_caps_get_free_size`.
+
 3. Optimize the arena size.
     ```c++
     tflite::MicroInterpreter::arena_used_bytes()
     ```
+4. Run the following commands to see the memory usage:
+    ```bash
+    $ idf.py size
+    $ idf.py size-components
+    $ idf.py size-files
+    ```
+
+Espressif docs:
+- https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/performance/size.html
+- https://docs.espressif.com/projects/esp-idf/en/v5.5.4/esp32s3/api-reference/system/mem_alloc.html
+
 
 ### 05 Espressif Wake-word detection
 1. Test the app with the hilexin data (detection should fail).
 2. Configure the app for hilexin and test.
+
 
 ### 06 Espressif face detection
 Hardware only - no assignment
