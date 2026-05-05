@@ -148,7 +148,7 @@ class AppInference : public AppInferenceBase<int16_t>
 
         if (max_result > 0.8f)
         {
-            ESP_LOGI(TAG, "Detected %7s, score: %.2f", kCategoryLabels[max_idx],
+            ESP_LOGI(TAG, ">>> Detected %7s, score: %.2f", kCategoryLabels[max_idx],
                      static_cast<double>(max_result));
         }
         else

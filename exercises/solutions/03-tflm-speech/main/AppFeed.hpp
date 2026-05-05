@@ -10,6 +10,7 @@
 #include "no_1000ms.wav.h"
 #include "ringbuf.h"
 #include "tensorflow/lite/c/common.h"
+#include "yes-1.flac.h"
 #include "yes_1000ms.wav.h"
 
 #include "AppFeedBase.hpp"
@@ -110,8 +111,12 @@ class AppFeed : public AppFeedBase<int16_t>
     int offset_samples = 0;
 
     static constexpr raw_data_t<int16_t> audio_data[] = {
+        {kOfflineKeywordSample_yes1, kOfflineKeywordSampleLength_yes1},
         {kOfflineKeywordSample_no, kOfflineKeywordSampleLength_no},
-        {kOfflineKeywordSample_yes, kOfflineKeywordSampleLength_yes}};
+        {kOfflineKeywordSample_yes, kOfflineKeywordSampleLength_yes},
+        {kOfflineKeywordSample_no, kOfflineKeywordSampleLength_no},
+    };
+
     static const size_t audio_data_cnt = sizeof(audio_data) / sizeof(audio_data[0]);
 
     int current_index = -1;

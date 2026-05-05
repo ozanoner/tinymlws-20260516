@@ -49,7 +49,8 @@ Common parameters:
 
 Update the example projects in [../demo](../demo) as described:
 
-### 01 Edge Impulse keyword spotting
+### 01 Edge Impulse keyword spotting exercise
+**Goal**: KWS handling with an LED indicator.
 1. Record and convert an audio file ("good morning") to a header. Integrate it in the app.
     ```bash
     $ wavtoh.sh good-morning.flac good-morning.flac.h
@@ -61,6 +62,7 @@ Example: https://github.com/espressif/esp-iot-solution/blob/master/examples/indi
 
 
 ### 02 Edge Impulse image classification
+**Goal**: Integrating an object detection model in an application.
 1. Clone the project at https://studio.edgeimpulse.com/public/96468/latest
 2. Download the C++ SDK and copy the model in the project
 3. Test with a face pic
@@ -72,11 +74,12 @@ Object detection: https://docs.edgeimpulse.com/studio/projects/learning-blocks/b
 
 
 ### 03 Tensorflow Lite Micro speech
-1. Record and convert an audio file ("yes") to a header. Integrate it in the app.
-2. Modify `AppFeed.hpp` to return the "yes" data every time (no nullptr return).
+**Goal**: Parameterized detection threshold in an TFLM KWS app.
+1. Record and convert an audio file ("no") to a header. Integrate it in the app.
+2. Modify `AppFeed.hpp` to feed "yes" first, then "no". 
 3. Modify `AppInference.hpp`:
     - Parameterize the detection threshold in the `run` function
-    - Loop in the main app to find the detection point. Break when found.
+    - Break the main loop when "no" detected.
 
 ### 04 Tensorflow Lite Micro person detection 
 1. Test with new images.

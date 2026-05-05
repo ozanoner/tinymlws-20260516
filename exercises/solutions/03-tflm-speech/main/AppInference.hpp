@@ -10,6 +10,7 @@
 
 #include "micro_model_settings.h"
 #include "model.h"
+#include "sdkconfig.h"
 #include "tensorflow/lite/core/c/common.h"
 #include "tensorflow/lite/micro/micro_interpreter.h"
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
@@ -123,7 +124,7 @@ class AppInference : public AppInferenceBase<int16_t>
 
     /// Reads the model output tensor, dequantizes scores, logs the best
     /// keyword result, and resets the feature buffer for the next clip.
-    void handleResult() override
+    bool handleResult2()
     {
         // Read the quantized output scores produced by the model.
         TfLiteTensor* output = interpreter->output(0);
@@ -146,10 +147,16 @@ class AppInference : public AppInferenceBase<int16_t>
             }
         }
 
-        if (max_result > 0.8f)
+        if (max_result > detection_threshold)
         {
-            ESP_LOGI(TAG, "Detected %7s, score: %.2f", kCategoryLabels[max_idx],
+            ESP_LOGI(TAG, ">>> Detected %7s, score: %.2f", kCategoryLabels[max_idx],
                      static_cast<double>(max_result));
+
+            if (max_idx == 3) // "no" detected
+            {
+                ESP_LOGI(TAG, "NO detected!");
+                return true;
+            }
         }
         else
         {
@@ -158,6 +165,7 @@ class AppInference : public AppInferenceBase<int16_t>
 
         // Start the next clip with a cleared spectrogram history.
         feature_provider->reset();
+        return false;
     }
 
   private:
@@ -189,5 +197,8 @@ class AppInference : public AppInferenceBase<int16_t>
 
     // Timestamp of the previous feature-generation step in milliseconds.
     int32_t previous_time = 0;
+
+    // threshold for logging a detected keyword
+    static constexpr float detection_threshold = CONFIG_DETECTION_THRESHOLD / 100.0f;
 };
 } // namespace app

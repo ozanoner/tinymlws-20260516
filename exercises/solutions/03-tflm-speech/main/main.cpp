@@ -2,6 +2,8 @@
 // Repeatedly runs offline keyword spotting over bundled yes/no audio clips.
 
 #include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "sdkconfig.h"
 
 #include "AppInference.hpp"
@@ -19,6 +21,11 @@ extern "C" void app_main()
 
     while (inference.run())
     {
-        inference.handleResult();
+        bool no_detected = inference.handleResult2();
+        if (no_detected)
+        {
+            break;
+        }
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
