@@ -231,9 +231,11 @@ git checkout -b my-workshop-branch
 
 
 
-## 12. Accessing the ESP32 Serial Port
+## 12. Accessing the ESP32 Serial Port (optional)
 
-(Windows-WSL) If you are using a physical ESP32-S3 board together with WSL, follow the official Espressif documentation:
+If you have a physical ESP32-S3 board and want to use it in the examples, you will need serial port access to them.
+
+(Windows-WSL) If you are using the board together with WSL, follow the official Espressif documentation:
 
 - https://docs.espressif.com/projects/vscode-esp-idf-extension/en/latest/additionalfeatures/wsl.html
 
