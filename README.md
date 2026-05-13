@@ -13,7 +13,7 @@ Hands-on TinyML/Edge AI workshop for ESP32-S3 using ESP-IDF, Wokwi, Edge Impulse
 ### Hardware
 
 - Base workshop flow can run with Wokwi (no physical board required).
-- A physical ESP32-S3 board is recommended for hardware-only examples.
+- You can also use a physical ESP32-S3 board if you have one.
 
 ### Software
 
