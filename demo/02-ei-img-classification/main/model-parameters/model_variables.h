@@ -89,7 +89,7 @@ ei_learning_block_config_tflite_graph_t ei_learning_block_config_904830_19 = {
     .block_id = 19,
     .output_tensors_indices = ei_output_tensors_indices_904830_19,
     .output_tensors_size = ei_output_tensors_size_904830_19,
-    .quantized = 0,
+    .quantized = 1,
     .compiled = 1,
     .graph_config = (void*)&ei_config_graph_904830_19,
     .dequantize_output = 0,
@@ -109,6 +109,11 @@ const ei_learning_block_t ei_learning_blocks_904830_1[ei_learning_blocks_904830_
     },
 };
 
+ei_fill_result_classification_i8_config_t ei_fill_result_classification_i8_config_904830_19 = {
+    .zero_point = -128,
+    .scale = 0.00390625
+};
+
 const size_t ei_postprocessing_blocks_904830_1_size = 1;
 const ei_postprocessing_block_t ei_postprocessing_blocks_904830_1[ei_postprocessing_blocks_904830_1_size] = {
     {
@@ -116,9 +121,9 @@ const ei_postprocessing_block_t ei_postprocessing_blocks_904830_1[ei_postprocess
         .type = EI_CLASSIFIER_MODE_CLASSIFICATION,
         .init_fn = NULL,
         .deinit_fn = NULL,
-        .postprocess_fn = &process_classification_f32,
+        .postprocess_fn = &process_classification_i8,
         .display_fn = NULL,
-        .config = NULL,
+        .config = (void*)&ei_fill_result_classification_i8_config_904830_19,
         .input_block_id = 19
     },
 };
@@ -133,7 +138,7 @@ const ei_impulse_t impulse_904830_1 = {
     .project_name = "Tutorial: Adding sight to your sensors",
     .impulse_id = 1,
     .impulse_name = "Image data #1 (EON Tuner Primary), Image, Transfer Learning (Images)",
-    .deploy_version = 73,
+    .deploy_version = 74,
 
     .nn_input_frame_size = 27648,
     .raw_sample_count = 9216,
