@@ -20,7 +20,9 @@
 			"extensions": [
 				"espressif.esp-idf-extension",
 				"ms-vscode.cpptools-extension-pack",
-				"wokwi.wokwi-vscode"
+				"ms-vscode.cmake-tools",
+				"wokwi.wokwi-vscode",
+				"mathematic.vscode-pdf"
 			],
 			"settings": {
 				"terminal.integrated.defaultProfile.linux": "bash",
