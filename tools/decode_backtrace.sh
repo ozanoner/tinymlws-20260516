@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+
+# Decodes ESP-IDF backtrace addresses from stdin into function/file:line frames.
+# Usage: <log_source> | ./decode_backtrace.sh [target]
+# Example: cat crash.log | ./decode_backtrace.sh esp32s3
+
 set -euo pipefail
 
 TARGET="${1:-${PRJ_BUILD_TARGET:-esp32}}"

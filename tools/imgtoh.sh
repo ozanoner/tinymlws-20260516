@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# Converts an image to a 96x96 C/C++ header payload, optionally in grayscale (-g).
+# Usage: ./imgtoh.sh <input_file> <output_file> [-g]
+# Example: ./imgtoh.sh face1.png face1.h -g
+
 set -euo pipefail
 
 GRAYSCALE=0
