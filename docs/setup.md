@@ -47,9 +47,47 @@ Repository:
 ![Workshop repo](img/screenshot-02.png)
 
 
+## 5. Configure the Wokwi CI Token
+
+The workshop environment uses Wokwi integration and needs a Wokwi CI token.
 
 
-## 5. Reopen the Project in a Dev Container
+
+### Create a Wokwi Account
+
+- https://wokwi.com/
+
+### Generate a CI Token
+
+Open:
+
+- https://wokwi.com/dashboard/ci
+
+Then:
+
+1. Create a new token
+2. Copy the generated token
+
+![Wokwi CI token](img/screenshot-07.png)
+
+### Add the Token to the Project
+
+Inside the project root, create a file named:
+
+```text
+.env
+```
+
+Add the following:
+
+```text
+WOKWI_CLI_TOKEN=your_token_here
+```
+
+![Add the token in the environment](img/screenshot-08.png)
+
+
+## 6. Open the project folder with VSCode and Reopen the Dev Container
 
 Once the repository is opened in VS Code:
 
@@ -65,7 +103,7 @@ VS Code will begin building the development container.
 
 
 
-## 6. Install Docker
+## 7. Install Docker
 
 Dev Containers require Docker.
 
@@ -79,7 +117,7 @@ Install Docker Desktop for your operating system:
 
 
 
-## 7. Fix Docker Permissions
+## 8. Fix Docker Permissions
 
 If you see permission errors related to Docker inside WSL, add the `devcontainers` user to the `docker` group.
 
@@ -120,66 +158,6 @@ Verify Docker access:
 ```bash
 docker ps
 ```
-
-
-
-## 8. Configure the Wokwi CI Token
-
-The workshop environment uses Wokwi integration and needs a Wokwi CI token.
-
-![Wokwi CI token needed](img/screenshot-06.png)
-
-### Create a Wokwi Account
-
-- https://wokwi.com/
-
-### Generate a CI Token
-
-Open:
-
-- https://wokwi.com/dashboard/ci
-
-Then:
-
-1. Create a new token
-2. Copy the generated token
-
-![Wokwi CI token](img/screenshot-07.png)
-
-### Add the Token to the Project
-
-Inside the project root, create a file named:
-
-```text
-.env
-```
-
-Add the following:
-
-```text
-WOKWI_CLI_TOKEN=your_token_here
-```
-
-![Add the token in the environment](img/screenshot-08.png)
-
-### Reopen the Dev Container
-
-Open the command palette:
-
-```text
-Ctrl + Shift + P
-```
-
-Then select:
-
-```text
-Dev Containers: Rebuild and Reopen in Container
-```
-
-**The devcontainer environment should be ready at this point.**
-
-![Dev Container is ready](img/screenshot-09.png)
-
 
 
 ## 9. Configure the Wokwi VS Code Extension
@@ -253,11 +231,20 @@ Before the workshop begins, confirm the following:
 - Docker installed and running
 - Git installed
 - Repository cloned successfully
-- Dev Container builds correctly
 - Wokwi account created
 - Wokwi token configured
+- Dev Container builds correctly
 - ESP-IDF environment verified
 
+
+# Troubleshooting
+1. Docker access failure: If you have already set the permission, reboot your computer and start VSCode again.
+
+2. Dev container needs the .env file to start successfully. Add it if you've forgotten and reopen the project in the devcontainer.
+
+![Wokwi CI token needed](img/screenshot-06.png)
+
+3. To have Git functionality, you need to configure the local repo with your name and email (as done in Step 11).
 
 
 # Notes
