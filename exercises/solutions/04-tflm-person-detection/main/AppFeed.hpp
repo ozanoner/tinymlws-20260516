@@ -8,7 +8,6 @@
 #include <algorithm>
 
 #include "cat-1.png.h"
-#include "chimp-1.png.h"
 #include "human-1.png.h"
 #include "human-2.png.h"
 #include "human-3.png.h"
@@ -44,9 +43,9 @@ class AppFeed : public AppFeedBase<int8_t>
   private:
     static constexpr const char* TAG = "feed";
     const uint8_t* image_database[IMAGE_COUNT]{
-        image_data1,
-        image_data2,
-        image_data3,
+        cat1_data,
+        human2_data,
+        human1_data,
     };
 
     int8_t current_image[IMAGE_SIZE]{};
