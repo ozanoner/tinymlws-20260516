@@ -39,8 +39,7 @@ class AppInference : public AppInferenceBase<int16_t>
         // Access the compiled flatbuffer model stored in flash.
         model = tflite::GetModel(g_model);
 
-        // An easier approach is to just use the AllOpsResolver
-        // tflite::AllOpsResolver resolver;
+        // Select the TFLite Micro operators we need to run the model.
         static tflite::MicroMutableOpResolver<4> micro_op_resolver;
         micro_op_resolver.AddDepthwiseConv2D();
         micro_op_resolver.AddFullyConnected();
@@ -169,20 +168,20 @@ class AppInference : public AppInferenceBase<int16_t>
     // TFLite Micro interpreter bound to the speech model and tensor arena.
     tflite::MicroInterpreter* interpreter = nullptr;
 
-    // Input tensor that receives the flattened spectrogram features.
-    TfLiteTensor* model_input = nullptr;
+    // Scratch arena used by TFLite Micro for tensors and intermediate buffers.
+    uint8_t tensor_arena[TENSOR_ARENA_SIZE];
 
     // Feature extractor that maintains the rolling spectrogram state.
     AppFeatures* feature_provider = nullptr;
 
+    // Rolling spectrogram buffer written by AppFeatures.
+    int8_t feature_buffer[kFeatureElementCount];
+
     // Offline audio source that serves the bundled yes/no clips.
     AppFeed app_feed;
 
-    // Scratch arena used by TFLite Micro for tensors and intermediate buffers.
-    uint8_t tensor_arena[TENSOR_ARENA_SIZE];
-
-    // Rolling spectrogram buffer written by AppFeatures.
-    int8_t feature_buffer[kFeatureElementCount];
+    // Input tensor that receives the flattened spectrogram features.
+    TfLiteTensor* model_input = nullptr;
 
     // Raw pointer to the input tensor payload for fast writes before invoke.
     int8_t* model_input_buffer = nullptr;
