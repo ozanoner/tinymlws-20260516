@@ -26,7 +26,7 @@ class AppFeed : public AppFeedBase<int16_t>
   public:
     virtual ~AppFeed() = default;
 
-    /// Resets the history buffer to silence and clears the sample offset,
+    /// Resets the buffer,
     /// preparing the window for the start of a new audio clip.
     void init() override
     {
