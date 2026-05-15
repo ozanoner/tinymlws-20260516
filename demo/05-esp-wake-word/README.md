@@ -54,8 +54,12 @@ idf.py flash monitor -p /dev/ttyACM0
 ```
 
 ## References:
+- https://docs.espressif.com/projects/esp-sr/en/latest/esp32s3/getting_started/readme.html
 - https://docs.espressif.com/projects/esp-sr/en/latest/esp32s3/wake_word_engine/README.html
 - https://docs.espressif.com/projects/esp-sr/en/latest/esp32s3/audio_front_end/README.html
 - https://docs.espressif.com/projects/esp-sr/en/latest/esp32s3/speech_command_recognition/README.html
 - https://docs.espressif.com/projects/esp-sr/en/latest/esp32s3/benchmark/README.html
 - https://github.com/espressif/esp-skainet/tree/master
+- https://docs.espressif.com/projects/esp-sr/en/latest/esp32/wake_word_engine/ESP_Wake_Words_Customization.html
+- https://docs.espressif.com/projects/esp-sr/en/latest/esp32/benchmark/README.html
+

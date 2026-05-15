@@ -24,9 +24,9 @@ class AppInference : public AppInferenceBase<int16_t>
     /// Releases the WakeNet model instance if it was created.
     ~AppInference() override
     {
-        if (wakenet != nullptr && model_data != nullptr)
+        if (wakenet != nullptr && model_instance != nullptr)
         {
-            wakenet->destroy(model_data);
+            wakenet->destroy(model_instance);
         }
     }
 
@@ -34,41 +34,51 @@ class AppInference : public AppInferenceBase<int16_t>
     /// audio chunk size expected by the detector.
     void init() override
     {
+        // access to the models in the 'model' partition
         models = esp_srmodel_init("model");
-        if (models == NULL)
+        if (models == nullptr)
         {
             ESP_LOGE(TAG, "Failed to init models from partition 'model'");
             return;
         }
 
-        char* model_name = esp_srmodel_filter(models, "", "wn9s_hiesp");
-        if (model_name == NULL)
+        // find the model name for the "Hi ESP" wake word
+        char* model_name = esp_srmodel_filter(models, ESP_WN_PREFIX, "hiesp");
+        if (model_name == nullptr)
         {
             ESP_LOGE(TAG, "No wake model found for hiesp");
             return;
         }
+        else
+        {
+            ESP_LOGI(TAG, "Found model: %s", model_name);
+        }
 
+        // get the wakenet interface for the model
         wakenet = (esp_wn_iface_t*)esp_wn_handle_from_name(model_name);
-        if (wakenet == NULL)
+        if (wakenet == nullptr)
         {
             ESP_LOGE(TAG, "Failed to get wakenet handle for model: %s", model_name);
             return;
         }
 
-        model_data = wakenet->create(model_name, DET_MODE_95);
-        if (model_data == NULL)
+        // initialize the model instance with the default detection mode (DET_MODE_95)
+        // aggressive detection. more false positives.
+        // load model data and get ready for detection
+        model_instance = wakenet->create(model_name, DET_MODE_95);
+        if (model_instance == nullptr)
         {
             ESP_LOGE(TAG, "Failed to create model: %s", model_name);
             return;
         }
 
-        audio_chunksize = wakenet->get_samp_chunksize(model_data) * sizeof(int16_t);
+        audio_chunksize = wakenet->get_samp_chunksize(model_instance) * sizeof(int16_t);
     }
 
     /// Returns the detector input chunk size in bytes.
     int getAudioChunkSize()
     {
-        return wakenet == nullptr ? 0 : wakenet->get_samp_chunksize(model_data) * sizeof(int16_t);
+        return audio_chunksize;
     }
 
     /// Stores the next PCM chunk to be processed.
@@ -87,7 +97,7 @@ class AppInference : public AppInferenceBase<int16_t>
     bool run() override
     {
         wakenet_state_t state =
-            wakenet->detect(model_data, const_cast<int16_t*>(current_data->data));
+            wakenet->detect(model_instance, const_cast<int16_t*>(current_data->data));
         if (state == WAKENET_DETECTED)
         {
             detected = true;
@@ -110,7 +120,7 @@ class AppInference : public AppInferenceBase<int16_t>
 
     srmodel_list_t* models{nullptr};
     esp_wn_iface_t* wakenet{nullptr};
-    model_iface_data_t* model_data{nullptr};
+    model_iface_data_t* model_instance{nullptr};
     int audio_chunksize{0};
     const raw_data_t<int16_t>* current_data{nullptr};
 
