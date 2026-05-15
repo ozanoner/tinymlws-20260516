@@ -41,6 +41,7 @@ idf.py flash monitor -p /dev/ttyACM0
 # References
 
 - https://components.espressif.com/components/espressif/human_face_detect
+- https://github.com/espressif/esp-dl/tree/master/models/human_face_detect/models/s3
 - https://github.com/espressif/esp-dl
 - https://github.com/espressif/esp-dl/tree/master/docs/en/tutorials
 - https://github.com/espressif/esp-dl/blob/master/docs/en/tutorials/how_to_run_model.rst

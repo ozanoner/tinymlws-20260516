@@ -30,11 +30,11 @@ class AppInference : public AppInferenceBase<uint8_t>
     /// Creates the HumanFaceDetect model and sets the score threshold for both stages.
     void init() override
     {
-        model = new HumanFaceDetect(
-            static_cast<HumanFaceDetect::model_type_t>(CONFIG_DEFAULT_HUMAN_FACE_DETECT_MODEL),
-            false);
+        // model = new HumanFaceDetect(
+        //     static_cast<HumanFaceDetect::model_type_t>(CONFIG_DEFAULT_HUMAN_FACE_DETECT_MODEL),
+        //     false);
+        model = new HumanFaceDetect();
         model->set_score_thr(score_threshold, 0);
-        // model->set_score_thr(score_threshold, 1);
     }
 
     /// Stores @p data as the frame for the next `run()` call.
